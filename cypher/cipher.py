@@ -10,12 +10,18 @@ class Key:
             if key_value is None:
                 raise ValueError(f'{key_name} must have a value')
 
+    def random(self):
+        for key_name in self.__dict__.keys():
+            self.__setattr__(key_name, None)
+        self.validate()
+
     def print(self):
         pprint.pprint(self.__dict__)
 
 
 class Cipher:
     ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    NAME = 'Generic'
 
     def __init__(self, alphabet=ALPHABET, plaintext='', ciphertext='', key=None):
         self.alphabet = alphabet
