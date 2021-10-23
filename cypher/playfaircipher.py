@@ -154,3 +154,4 @@ class PlayfairCipher(Cipher):
     def decrypt(self):
         super(PlayfairCipher, self).decrypt()
         self.plaintext = crypt(self.ciphertext, self.key.key_table, -1)
+        # TODO: Find words, separate

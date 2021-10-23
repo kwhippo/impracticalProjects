@@ -66,3 +66,5 @@ class PigLatinCipher(Cipher):
         for word in words:
             translated_words.append(word_to_pig_latin(word))
         self.ciphertext = ' '.join(translated_words)
+
+    # TODO: add decrypt method
