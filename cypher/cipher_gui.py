@@ -168,6 +168,10 @@ class CipherGUI:
         # Create Key Frame
         self.frame_key = key_frame(master)
 
+        # Define Cipher variables
+        self.variable_plaintext = ''
+        self.variable_ciphertext = ''
+
         # Create Cipher Frame
         self.frame_cipher = ttk.Frame(master)
 
@@ -207,6 +211,16 @@ class CipherGUI:
         t = get_random_fortune()
         self.text_plaintext.replace('1.0', 'end', t)
 
+    def encrypt_button(self):
+        self.variable_plaintext = self.text_plaintext.get('1.0', 'end')
+        cipher.encrypt()
+        self.text_ciphertext.replace('1.0', 'end', cipher.ciphertext)
+
+    def decrypt_button(self):
+        self.variable_ciphertext = self.text_ciphertext.get('1.0', 'end')
+        cipher.decrypt()
+        self.text_plaintext.replace('1.0', 'end', cipher.plaintext)
+
 
 def main():
     global cipher
@@ -215,6 +229,7 @@ def main():
     main_menu(root)
     cipher = SubstitutionCipher()
     key = SubstitutionKey()
+    cipher.key = key
     CipherGUI(root)
     root.mainloop()
 
