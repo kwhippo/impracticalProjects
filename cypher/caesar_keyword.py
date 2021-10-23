@@ -47,4 +47,4 @@ class CaesarKeywordKey(SubstitutionKey):
 
 
 class CaesarKeywordCipher(SubstitutionCipher):
-    pass
+    NAME = 'Caesar Keyword'

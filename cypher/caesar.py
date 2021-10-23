@@ -85,4 +85,4 @@ class CaesarKey(SubstitutionKey):
 
 
 class CaesarCipher(SubstitutionCipher):
-    pass
+    NAME = 'Caesar'

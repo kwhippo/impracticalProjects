@@ -140,6 +140,7 @@ class PlayfairKey(Key):
 
 class PlayfairCipher(Cipher):
     ALPHABET = 'ABCDEFGHIKLMNOPQRSTUVWXYZ'
+    NAME = 'Playfair'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

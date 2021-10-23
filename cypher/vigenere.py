@@ -62,6 +62,8 @@ class VigenereKey(Key):
 
 
 class VigenereCipher(Cipher):
+    NAME = 'Vigenere'
+
     def __init__(self, *args, **kwargs):
         super(VigenereCipher, self).__init__(*args, **kwargs)
 

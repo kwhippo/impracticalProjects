@@ -42,6 +42,8 @@ class SubstitutionKey(Key):
 
 
 class SubstitutionCipher(Cipher):
+    NAME = 'Simple Substitution'
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
