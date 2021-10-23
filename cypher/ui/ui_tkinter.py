@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
-from substitution import SubstitutionCipher, SubstitutionKey, random_substitution_key
-from utilities import get_random_fortune
+from cypher.substitution import SubstitutionCipher, SubstitutionKey, random_substitution_key
+from cypher.utilities import get_random_fortune
 
 # Setup Main Application Window
 root = Tk()
