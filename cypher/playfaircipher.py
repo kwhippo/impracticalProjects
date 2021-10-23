@@ -135,7 +135,7 @@ class PlayfairKey(Key):
         if self.key_table is None:
             self.key_table = create_key_table(self.keyword)
         validate_key_table(self.key_table)
-        super().validate()
+        super(PlayfairKey, self).validate()
 
 
 class PlayfairCipher(Cipher):

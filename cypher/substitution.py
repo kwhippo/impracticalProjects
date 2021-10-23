@@ -38,7 +38,7 @@ class SubstitutionKey(Key):
             self.alpha_key = validated
         except Exception as e:
             raise e
-        super().validate()
+        super(SubstitutionKey, self).validate()
 
 
 class SubstitutionCipher(Cipher):
