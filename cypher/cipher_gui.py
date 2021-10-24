@@ -75,6 +75,8 @@ class KeyGUI:
         self.variable_key_row_3 = StringVar()
         self.variable_key_row_4 = StringVar()
 
+        self.variable_keyword.trace_add('write', self.write_variable_keyword)
+
         self.frame_key_buttons = Frame(self.frame_key)
         self.button_clear = ttk.Button(self.frame_key_buttons, text='Clear',
                                        command=self.clear_key_button)
@@ -95,7 +97,7 @@ class KeyGUI:
                                                    format='%3.0f',
                                                    textvariable=self.variable_numeric_key,
                                                    command=self.spinbox_numeric_key_incremented)
-            self.variable_numeric_key.trace_add('write', self.write_spinbox_numeric_key)
+            self.variable_numeric_key.trace_add('write', self.write_variable_numeric_key)
             self.label_ab_key = ttk.Label(self.frame_key_variables, text='AB Key')
             self.combobox_ab_key = ttk.Combobox(self.frame_key_variables, width=4, textvariable=self.variable_ab_key)
             self.values_ab_key = []
@@ -124,9 +126,9 @@ class KeyGUI:
             self.scale_numeric_key.grid(row=3, column=2, columnspan=2, **pad_5_kwargs)
 
         elif type(key) == CaesarKeywordKey:
+            self.entry_alpha_key.state(['readonly'])
             self.label_keyword = ttk.Label(self.frame_key_variables, text='Keyword')
             self.entry_keyword = ttk.Entry(self.frame_key_variables, width=32, textvariable=self.variable_keyword)
-            self.entry_keyword.state(['readonly'])
 
             self.grid_substitution_key_variables()
             self.label_keyword.grid(row=1, column=0, padx=5, pady=5, sticky=E)
@@ -188,7 +190,7 @@ class KeyGUI:
         key.calculate(numeric_key=int(float(value)))
         self.set_key_variables(**key.get())
 
-    def write_spinbox_numeric_key(self, *args):
+    def write_variable_numeric_key(self, *args):
         if self.variable_numeric_key.get() != '':
             key.calculate(numeric_key=int(self.variable_numeric_key.get()))
             self.set_key_variables(**key.get())
@@ -204,6 +206,12 @@ class KeyGUI:
     def spinbox_numeric_key_incremented(self):
         key.calculate(numeric_key=int(self.variable_numeric_key.get()))
         self.set_key_variables(**key.get())
+
+    # Keyword Key Methods
+    def write_variable_keyword(self, *args):
+        if self.variable_keyword.get() != '':
+            key.calculate(keyword=self.variable_keyword.get())
+            self.set_key_variables(**key.get())
 
     # Key Methods
     def random_key_button(self):
