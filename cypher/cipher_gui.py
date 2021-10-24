@@ -10,9 +10,45 @@ from cypher.vigenere import VigenereCipher, VigenereKey
 global cipher
 global key
 
-
 balanced_grid_kwargs = {'sticky': (N, S, E, W), 'pady': 5, 'padx': 5}
 pad_5_kwargs = {'pady': 5, 'padx': 5}
+
+
+def set_cipher(master, cipher_type, key_type):
+    global cipher
+    global key
+
+    cipher = cipher_type()
+    key = key_type()
+    cipher.key = key
+
+    for frame in master.winfo_children():
+        if type(frame) == Menu:
+            pass
+        else:
+            frame.destroy()
+    KeyGUI(master)
+    CipherGUI(master)
+
+
+def main_menu(master):
+    master.option_add('*tearOff', False)
+    menubar = Menu(master)
+    master.config(menu=menubar)
+    ciphers = Menu(menubar)
+
+    menubar.add_cascade(menu=ciphers, label='Ciphers')
+
+    ciphers.add_command(label='Simple Substitution',
+                        command=lambda: set_cipher(master, SubstitutionCipher, SubstitutionKey))
+    ciphers.add_command(label='Caesar',
+                        command=lambda: set_cipher(master, CaesarCipher, CaesarKey))
+    ciphers.add_command(label='Caesar Keyword',
+                        command=lambda: set_cipher(master, CaesarKeywordCipher, CaesarKeywordKey))
+    ciphers.add_command(label='Playfair',
+                        command=lambda: set_cipher(master, PlayfairCipher, PlayfairKey))
+    ciphers.add_command(label='Vigenere',
+                        command=lambda: set_cipher(master, VigenereCipher, VigenereKey))
 
 
 class KeyGUI:
@@ -24,7 +60,7 @@ class KeyGUI:
         ttk.Label(self.frame_header, text=f'{cipher.NAME} Cipher', style='Header.TLabel').pack()
 
         # Create Key Frame
-        self.frame_key = Frame(master)
+        self.frame_key = LabelFrame(master, text='Key')
 
         # Setup Key Variables
         self.variable_alpha_key = StringVar()
@@ -39,8 +75,6 @@ class KeyGUI:
         self.variable_key_row_3 = StringVar()
         self.variable_key_row_4 = StringVar()
 
-        self.frame_key = LabelFrame(master, text='Key')
-
         self.frame_key_buttons = Frame(self.frame_key)
         self.button_clear = ttk.Button(self.frame_key_buttons, text='Clear',
                                        command=self.clear_key_button)
@@ -50,8 +84,7 @@ class KeyGUI:
         self.button_clear.grid(row=0, column=0, **balanced_grid_kwargs)
         self.button_random.grid(row=0, column=1, **balanced_grid_kwargs)
 
-        # Key Variables
-
+        # Key Variable Widgets
         self.frame_key_variables = Frame(self.frame_key)
         self.label_alpha_key = ttk.Label(self.frame_key_variables, text='Alpha Key')
         self.entry_alpha_key = ttk.Entry(self.frame_key_variables, width=32, textvariable=self.variable_alpha_key)
@@ -83,7 +116,7 @@ class KeyGUI:
 
             self.grid_substitution_key_variables()
             self.label_numeric_key.grid(row=1, column=0, **pad_5_kwargs, sticky=E)
-            self.spinbox_numeric_key.grid(row=1, column=1, **pad_5_kwargs, sticky=W,)
+            self.spinbox_numeric_key.grid(row=1, column=1, **pad_5_kwargs, sticky=W, )
             self.label_ab_key.grid(row=1, column=2, **pad_5_kwargs, sticky=E)
             self.combobox_ab_key.grid(row=1, column=3, **pad_5_kwargs, sticky=W)
             self.label_a_key.grid(row=3, column=0, **pad_5_kwargs, sticky=E)
@@ -93,6 +126,7 @@ class KeyGUI:
         elif type(key) == CaesarKeywordKey:
             self.label_keyword = ttk.Label(self.frame_key_variables, text='Keyword')
             self.entry_keyword = ttk.Entry(self.frame_key_variables, width=32, textvariable=self.variable_keyword)
+            self.entry_keyword.state(['readonly'])
 
             self.grid_substitution_key_variables()
             self.label_keyword.grid(row=1, column=0, padx=5, pady=5, sticky=E)
@@ -136,13 +170,15 @@ class KeyGUI:
             self.button_clear.state(['disabled'])
             self.button_random.state(['disabled'])
 
+        # Place Key Frames
         self.frame_key_variables.pack()
         self.frame_key_buttons.pack()
 
-        # Place Frames
+        # Place Cipher Key Frames
         self.frame_header.pack(pady=(10, 0))
         self.frame_key.pack(pady=10)
 
+    # Substitution Key Methods
     def grid_substitution_key_variables(self):
         self.label_alpha_key.grid(row=0, column=0, padx=5, pady=5, sticky=E)
         self.entry_alpha_key.grid(row=0, column=1, columnspan=3, padx=5, pady=5, sticky=W)
@@ -169,6 +205,7 @@ class KeyGUI:
         key.calculate(numeric_key=int(self.variable_numeric_key.get()))
         self.set_key_variables(**key.get())
 
+    # Key Methods
     def random_key_button(self):
         key.random()
         if type(key) == CaesarKey:
@@ -220,43 +257,6 @@ class KeyGUI:
                 self.variable_key_row_2.set(' '.join(value[2]))
                 self.variable_key_row_3.set(' '.join(value[3]))
                 self.variable_key_row_4.set(' '.join(value[4]))
-
-
-def main_menu(master):
-    master.option_add('*tearOff', False)
-    menubar = Menu(master)
-    master.config(menu=menubar)
-    ciphers = Menu(menubar)
-
-    menubar.add_cascade(menu=ciphers, label='Ciphers')
-
-    ciphers.add_command(label='Simple Substitution',
-                        command=lambda: set_cipher(master, SubstitutionCipher, SubstitutionKey))
-    ciphers.add_command(label='Caesar',
-                        command=lambda: set_cipher(master, CaesarCipher, CaesarKey))
-    ciphers.add_command(label='Caesar Keyword',
-                        command=lambda: set_cipher(master, CaesarKeywordCipher, CaesarKeywordKey))
-    ciphers.add_command(label='Playfair',
-                        command=lambda: set_cipher(master, PlayfairCipher, PlayfairKey))
-    ciphers.add_command(label='Vigenere',
-                        command=lambda: set_cipher(master, VigenereCipher, VigenereKey))
-
-
-def set_cipher(master, cipher_type, key_type):
-    global cipher
-    global key
-
-    cipher = cipher_type()
-    key = key_type()
-    cipher.key = key
-
-    for frame in master.winfo_children():
-        if type(frame) == Menu:
-            pass
-        else:
-            frame.destroy()
-    KeyGUI(master)
-    CipherGUI(master)
 
 
 class CipherGUI:
