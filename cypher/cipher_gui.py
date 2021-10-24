@@ -76,12 +76,13 @@ class KeyGUI:
                                                    format='%3.0f',
                                                    textvariable=self.variable_numeric_key)
             self.label_ab_key = ttk.Label(self.frame_key_variables, text='AB Key')
-            self.entry_ab_key = ttk.Entry(self.frame_key_variables, width=3, textvariable=self.variable_ab_key)
+            self.entry_ab_key = ttk.Entry(self.frame_key_variables, width=4, textvariable=self.variable_ab_key)
             self.label_a_key = ttk.Label(self.frame_key_variables, text='A Key')
             self.combobox_a_key = ttk.Combobox(self.frame_key_variables, width=3, textvariable=self.variable_a_key)
             self.combobox_a_key['values'] = list(cipher.alphabet)
-            self.scale_a_key = ttk.Scale(self.frame_key_variables, orient=HORIZONTAL, length=100, from_=0.0, to=25.0,
-                                         variable=self.variable_numeric_scale)
+            self.scale_numeric_key = ttk.Scale(self.frame_key_variables, orient=HORIZONTAL, length=100,
+                                               from_=0.0, to=25.0, variable=self.variable_numeric_scale,
+                                               command=self.update_scale_numeric_key)
 
             self.label_numeric_key.grid(row=1, column=0, **pad_5_kwargs, sticky=E)
             self.spinbox_numeric_key.grid(row=1, column=1, **pad_5_kwargs, sticky=W)
@@ -89,7 +90,7 @@ class KeyGUI:
             self.entry_ab_key.grid(row=1, column=3, **pad_5_kwargs, sticky=W)
             self.label_a_key.grid(row=3, column=0, **pad_5_kwargs, sticky=E)
             self.combobox_a_key.grid(row=3, column=1, **pad_5_kwargs, sticky=W)
-            self.scale_a_key.grid(row=3, column=2, columnspan=2, **pad_5_kwargs)
+            self.scale_numeric_key.grid(row=3, column=2, columnspan=2, **pad_5_kwargs)
 
         elif type(key) == CaesarKeywordKey:
             self.substitution_key_variables(self.frame_key_variables)
@@ -156,11 +157,7 @@ class KeyGUI:
             self.variable_numeric_key.set(key.numeric_key)
             self.variable_ab_key.set(key.ab_key)
             self.variable_a_key.set(key.a_key)
-
-            if key.numeric_key > 25:
-                self.variable_numeric_scale.set(key.numeric_key % 26)
-            else:
-                self.variable_numeric_scale.set(key.numeric_key)
+            self.variable_numeric_scale.set(key.numeric_key % 26)
 
         elif type(key) == CaesarKeywordKey:
             self.variable_alpha_key.set(key.alpha_key)
@@ -179,6 +176,30 @@ class KeyGUI:
 
         elif type(key) == VigenereKey:
             self.variable_keyword.set(key.keyword)
+
+    def update_scale_numeric_key(self, value):
+        key.calculate(numeric_key=int(float(value)))
+        self.set_key_variables(**key.get())
+
+    def set_key_variables(self, **kwargs):
+        for item, value in kwargs.items():
+            if item == 'alpha_key':
+                self.variable_alpha_key.set(value)
+            if item == 'numeric_key':
+                self.variable_numeric_key.set(value)
+                self.variable_numeric_scale.set(value % 26)
+            if item == 'ab_key':
+                self.variable_ab_key.set(value)
+            if item == 'a_key':
+                self.variable_a_key.set(value)
+            if item == 'keyword':
+                self.variable_keyword.set(value)
+            if item == 'key_table' and type(key) == PlayfairKey:
+                self.variable_key_row_0.set(' '.join(value[0]))
+                self.variable_key_row_1.set(' '.join(value[1]))
+                self.variable_key_row_2.set(' '.join(value[2]))
+                self.variable_key_row_3.set(' '.join(value[3]))
+                self.variable_key_row_4.set(' '.join(value[4]))
 
 
 def main_menu(master):
