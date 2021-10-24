@@ -49,6 +49,7 @@ class VigenereKey(Key):
             self.key_list = key_list
 
     def calculate(self, *, keyword=None):
+        self.keyword = keyword
         self.key_list = create_key_list(keyword)
 
     def validate(self, alphabet=Cipher.ALPHABET):

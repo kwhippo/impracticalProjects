@@ -136,6 +136,7 @@ class PlayfairKey(Key):
             self.key_table = key_table
 
     def calculate(self, *, keyword=None):
+        self.keyword = keyword
         self.key_table = create_key_table(keyword)
 
     def validate(self):
