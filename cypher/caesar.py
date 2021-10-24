@@ -35,24 +35,26 @@ def create_keys(input_key=None, alphabet=Cipher.ALPHABET):
 def get_key_type(input_key, alphabet=Cipher.ALPHABET):
     try:
         input_key = str(input_key)
-        if input_key.isnumeric():
+        try:
+            int(input_key)
             key_type = 'numeric_key'
-        elif input_key.isalpha() and len(input_key) == 2:
-            key_type = 'ab_key'
-        elif input_key.isalpha() and len(input_key) == 1:
-            key_type = 'a_key'
-        elif len(input_key) == len(alphabet):
-            numeric_key = input_key.find(alphabet[0])
-            if numeric_key == -1:
-                raise ValueError('Input alpha key not found in alphabet')
-            else:
-                alpha = alphabet[:numeric_key] + alphabet[numeric_key:]
-                if alpha == alphabet:
-                    key_type = 'alpha_key'
+        except ValueError:
+            if input_key.isalpha() and len(input_key) == 2:
+                key_type = 'ab_key'
+            elif input_key.isalpha() and len(input_key) == 1:
+                key_type = 'a_key'
+            elif len(input_key) == len(alphabet):
+                numeric_key = input_key.find(alphabet[0])
+                if numeric_key == -1:
+                    raise ValueError('Input alpha key not found in alphabet')
                 else:
-                    raise ValueError('Input alpha key does not match alphabet')
-        else:
-            raise ValueError
+                    alpha = alphabet[:numeric_key] + alphabet[numeric_key:]
+                    if alpha == alphabet:
+                        key_type = 'alpha_key'
+                    else:
+                        raise ValueError('Input alpha key does not match alphabet')
+            else:
+                raise ValueError
     except ValueError:
         raise ValueError('Input key is not a valid key type')
     return key_type
