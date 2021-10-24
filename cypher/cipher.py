@@ -5,6 +5,9 @@ class Key:
     def __init__(self):
         pass
 
+    def get(self):
+        return self.__dict__
+
     def validate(self):
         for key_name, key_value in self.__dict__.items():
             if key_value is None:
