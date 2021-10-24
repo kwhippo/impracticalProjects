@@ -11,22 +11,6 @@ global cipher
 global key
 
 
-def clear_field(field):
-    if type(field) == ttk.Entry or \
-            type(field) == ttk.Spinbox or \
-            type(field) == ttk.Combobox:
-        field.delete(0, END)
-    elif type(field) == Text:
-        field.delete('1.0', END)
-    elif type(field) == ttk.Scale:
-        field.set(0)
-
-
-def clear_fields(master):
-    for widget in master.winfo_children():
-        clear_field(widget)
-
-
 balanced_grid_kwargs = {'sticky': (N, S, E, W), 'pady': 5, 'padx': 5}
 pad_5_kwargs = {'pady': 5, 'padx': 5}
 
@@ -59,7 +43,7 @@ class KeyGUI:
 
         self.frame_key_buttons = Frame(self.frame_key)
         self.button_clear = ttk.Button(self.frame_key_buttons, text='Clear',
-                                       command=lambda: clear_fields(self.frame_key_variables))
+                                       command=self.clear_key_button)
         self.button_random = ttk.Button(self.frame_key_buttons, text='Random',
                                         command=self.random_key_button)
 
@@ -69,38 +53,53 @@ class KeyGUI:
         # Key Variables
 
         self.frame_key_variables = Frame(self.frame_key)
+        self.label_alpha_key = ttk.Label(self.frame_key_variables, text='Alpha Key')
+        self.entry_alpha_key = ttk.Entry(self.frame_key_variables, width=32, textvariable=self.variable_alpha_key)
         if type(key) == CaesarKey:
-            self.substitution_key_variables(self.frame_key_variables)
+            self.entry_alpha_key.state(['readonly'])
             self.label_numeric_key = ttk.Label(self.frame_key_variables, text='Numeric Key')
-            self.spinbox_numeric_key = ttk.Spinbox(self.frame_key_variables, from_=-25.0, to=25.0, width=5,
+            self.spinbox_numeric_key = ttk.Spinbox(self.frame_key_variables, from_=-100.0, to=100.0, width=5,
                                                    format='%3.0f',
-                                                   textvariable=self.variable_numeric_key)
+                                                   textvariable=self.variable_numeric_key,
+                                                   command=self.spinbox_numeric_key_incremented)
+            self.variable_numeric_key.trace_add('write', self.write_spinbox_numeric_key)
             self.label_ab_key = ttk.Label(self.frame_key_variables, text='AB Key')
-            self.entry_ab_key = ttk.Entry(self.frame_key_variables, width=4, textvariable=self.variable_ab_key)
+            self.combobox_ab_key = ttk.Combobox(self.frame_key_variables, width=4, textvariable=self.variable_ab_key)
+            self.values_ab_key = []
+            for a in cipher.alphabet:
+                for b in cipher.alphabet:
+                    self.values_ab_key.append(f'{a}{b}')
+            self.combobox_ab_key['values'] = self.values_ab_key
+            self.combobox_ab_key.state(['readonly'])
+            self.combobox_ab_key.bind('<<ComboboxSelected>>', self.combobox_ab_key_selected)
             self.label_a_key = ttk.Label(self.frame_key_variables, text='A Key')
             self.combobox_a_key = ttk.Combobox(self.frame_key_variables, width=3, textvariable=self.variable_a_key)
             self.combobox_a_key['values'] = list(cipher.alphabet)
+            self.combobox_a_key.state(['readonly'])
+            self.combobox_a_key.bind('<<ComboboxSelected>>', self.combobox_a_key_selected)
             self.scale_numeric_key = ttk.Scale(self.frame_key_variables, orient=HORIZONTAL, length=100,
                                                from_=0.0, to=25.0, variable=self.variable_numeric_scale,
                                                command=self.update_scale_numeric_key)
 
+            self.grid_substitution_key_variables()
             self.label_numeric_key.grid(row=1, column=0, **pad_5_kwargs, sticky=E)
-            self.spinbox_numeric_key.grid(row=1, column=1, **pad_5_kwargs, sticky=W)
+            self.spinbox_numeric_key.grid(row=1, column=1, **pad_5_kwargs, sticky=W,)
             self.label_ab_key.grid(row=1, column=2, **pad_5_kwargs, sticky=E)
-            self.entry_ab_key.grid(row=1, column=3, **pad_5_kwargs, sticky=W)
+            self.combobox_ab_key.grid(row=1, column=3, **pad_5_kwargs, sticky=W)
             self.label_a_key.grid(row=3, column=0, **pad_5_kwargs, sticky=E)
             self.combobox_a_key.grid(row=3, column=1, **pad_5_kwargs, sticky=W)
             self.scale_numeric_key.grid(row=3, column=2, columnspan=2, **pad_5_kwargs)
 
         elif type(key) == CaesarKeywordKey:
-            self.substitution_key_variables(self.frame_key_variables)
             self.label_keyword = ttk.Label(self.frame_key_variables, text='Keyword')
             self.entry_keyword = ttk.Entry(self.frame_key_variables, width=32, textvariable=self.variable_keyword)
+
+            self.grid_substitution_key_variables()
             self.label_keyword.grid(row=1, column=0, padx=5, pady=5, sticky=E)
             self.entry_keyword.grid(row=1, column=1, columnspan=3, padx=5, pady=5, sticky=W)
 
         elif type(key) == SubstitutionKey:
-            self.substitution_key_variables(self.frame_key_variables)
+            self.grid_substitution_key_variables()
 
         elif type(key) == PlayfairKey:
             self.label_keyword = ttk.Label(self.frame_key_variables, text='Keyword')
@@ -144,11 +143,31 @@ class KeyGUI:
         self.frame_header.pack(pady=(10, 0))
         self.frame_key.pack(pady=10)
 
-    def substitution_key_variables(self, frame_key_variables):
-        label_alpha_key = ttk.Label(frame_key_variables, text='Alpha Key')
-        entry_alpha_key = ttk.Entry(frame_key_variables, width=32, textvariable=self.variable_alpha_key)
-        label_alpha_key.grid(row=0, column=0, padx=5, pady=5, sticky=E)
-        entry_alpha_key.grid(row=0, column=1, columnspan=3, padx=5, pady=5, sticky=W)
+    def grid_substitution_key_variables(self):
+        self.label_alpha_key.grid(row=0, column=0, padx=5, pady=5, sticky=E)
+        self.entry_alpha_key.grid(row=0, column=1, columnspan=3, padx=5, pady=5, sticky=W)
+
+    # Caesar Key Methods
+    def update_scale_numeric_key(self, value):
+        key.calculate(numeric_key=int(float(value)))
+        self.set_key_variables(**key.get())
+
+    def write_spinbox_numeric_key(self, *args):
+        if self.variable_numeric_key.get() != '':
+            key.calculate(numeric_key=int(self.variable_numeric_key.get()))
+            self.set_key_variables(**key.get())
+
+    def combobox_ab_key_selected(self, event):
+        key.calculate(ab_key=self.variable_ab_key.get())
+        self.set_key_variables(**key.get())
+
+    def combobox_a_key_selected(self, event):
+        key.calculate(a_key=self.variable_a_key.get())
+        self.set_key_variables(**key.get())
+
+    def spinbox_numeric_key_incremented(self):
+        key.calculate(numeric_key=int(self.variable_numeric_key.get()))
+        self.set_key_variables(**key.get())
 
     def random_key_button(self):
         key.random()
@@ -177,9 +196,10 @@ class KeyGUI:
         elif type(key) == VigenereKey:
             self.variable_keyword.set(key.keyword)
 
-    def update_scale_numeric_key(self, value):
-        key.calculate(numeric_key=int(float(value)))
-        self.set_key_variables(**key.get())
+    def clear_key_button(self):
+        for variable in self.__dict__.values():
+            if type(variable) == StringVar:
+                variable.set('')
 
     def set_key_variables(self, **kwargs):
         for item, value in kwargs.items():
@@ -255,7 +275,7 @@ class CipherGUI:
         self.label_plaintext = ttk.Label(self.frame_cipher, text='Plaintext')
         self.text_plaintext = Text(self.frame_cipher, width=50, height=10, wrap='word')
         self.button_clear_plaintext = ttk.Button(self.frame_cipher, text='Clear',
-                                                 command=lambda: clear_field(self.text_plaintext))
+                                                 command=lambda: self.text_plaintext.delete('1.0', END))
         self.button_random_plaintext = ttk.Button(self.frame_cipher, text='Random',
                                                   command=self.random_plaintext)
         self.button_encrypt = ttk.Button(self.frame_cipher, text='Encrypt', command=self.encrypt_button)
@@ -263,7 +283,7 @@ class CipherGUI:
         self.label_ciphertext = ttk.Label(self.frame_cipher, text='Ciphertext')
         self.text_ciphertext = Text(self.frame_cipher, width=50, height=10, wrap='word')
         self.button_clear_ciphertext = ttk.Button(self.frame_cipher, text='Clear',
-                                                  command=lambda: clear_field(self.text_ciphertext))
+                                                  command=lambda: self.text_ciphertext.delete('1.0', END))
         # self.button_random_ciphertext = ttk.Button(self.frame_cipher, text='Random')
         self.button_decrypt = ttk.Button(self.frame_cipher, text='Decrypt', command=self.decrypt_button)
 
