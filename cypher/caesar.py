@@ -65,6 +65,49 @@ class CaesarKey(SubstitutionKey):
         self.ab_key = ab_key
         self.a_key = a_key
 
+    def set(self, *, alpha_key=None, numeric_key=None, ab_key=None, a_key=None):
+        if alpha_key is not None:
+            self.alpha_key = alpha_key
+        if numeric_key is not None:
+            self.numeric_key = numeric_key
+        if ab_key is not None:
+            self.ab_key = ab_key
+        if a_key is not None:
+            self.a_key = a_key
+
+    def calculate(self, *, alpha_key=None, numeric_key=None, ab_key=None, a_key=None):
+        try:
+            if alpha_key is not None:
+                assert numeric_key is None
+                assert ab_key is None
+                assert a_key is None
+                keys = create_keys(alpha_key)
+                keys['alpha_key'] = alpha_key
+                self.set(**keys)
+            if numeric_key is not None:
+                assert alpha_key is None
+                assert ab_key is None
+                assert a_key is None
+                keys = create_keys(numeric_key)
+                keys['numeric_key'] = numeric_key
+                self.set(**keys)
+            if ab_key is not None:
+                assert alpha_key is None
+                assert numeric_key is None
+                assert a_key is None
+                keys = create_keys(ab_key)
+                keys['ab_key'] = ab_key
+                self.set(**keys)
+            if a_key is not None:
+                assert alpha_key is None
+                assert numeric_key is None
+                assert ab_key is None
+                keys = create_keys(a_key)
+                keys['a_key'] = a_key
+                self.set(**keys)
+        except AssertionError:
+            raise AssertionError('Calculate method only expects 1 keyword argument')
+
     def validate(self, alphabet=Cipher.ALPHABET):
         validation_key = None
         for key_name, key_value in self.__dict__.items():
