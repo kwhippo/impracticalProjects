@@ -106,12 +106,12 @@ class KeyGUI:
                     self.values_ab_key.append(f'{a}{b}')
             self.combobox_ab_key['values'] = self.values_ab_key
             self.combobox_ab_key.state(['readonly'])
-            self.combobox_ab_key.bind('<<ComboboxSelected>>', self.combobox_ab_key_selected)
+            self.combobox_ab_key.bind('<<ComboboxSelected>>', lambda e: self.combobox_ab_key_selected())
             self.label_a_key = ttk.Label(self.frame_key_variables, text='A Key')
             self.combobox_a_key = ttk.Combobox(self.frame_key_variables, width=3, textvariable=self.variable_a_key)
             self.combobox_a_key['values'] = list(cipher.alphabet)
             self.combobox_a_key.state(['readonly'])
-            self.combobox_a_key.bind('<<ComboboxSelected>>', self.combobox_a_key_selected)
+            self.combobox_a_key.bind('<<ComboboxSelected>>', lambda e: self.combobox_a_key_selected())
             self.scale_numeric_key = ttk.Scale(self.frame_key_variables, orient=HORIZONTAL, length=100,
                                                from_=0.0, to=25.0, variable=self.variable_numeric_scale,
                                                command=self.update_scale_numeric_key)
@@ -195,11 +195,11 @@ class KeyGUI:
             key.calculate(numeric_key=int(self.variable_numeric_key.get()))
             self.set_key_variables(**key.get())
 
-    def combobox_ab_key_selected(self, event):
+    def combobox_ab_key_selected(self):
         key.calculate(ab_key=self.variable_ab_key.get())
         self.set_key_variables(**key.get())
 
-    def combobox_a_key_selected(self, event):
+    def combobox_a_key_selected(self):
         key.calculate(a_key=self.variable_a_key.get())
         self.set_key_variables(**key.get())
 
