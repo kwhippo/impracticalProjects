@@ -129,6 +129,15 @@ class PlayfairKey(Key):
         self.keyword = keyword
         self.key_table = key_table
 
+    def set(self, *, keyword=None, key_table=None):
+        if keyword is not None:
+            self.keyword = keyword
+        if key_table is not None:
+            self.key_table = key_table
+
+    def calculate(self, *, keyword=None):
+        self.key_table = create_key_table(keyword)
+
     def validate(self):
         if self.keyword is None and self.key_table is None:
             self.keyword = get_random_word('pokemon')

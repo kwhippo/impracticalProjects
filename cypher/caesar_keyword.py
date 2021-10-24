@@ -36,6 +36,16 @@ class CaesarKeywordKey(SubstitutionKey):
         super(CaesarKeywordKey, self).__init__(*args, **kwargs)
         self.keyword = keyword
 
+    def set(self, *, alpha_key=None, keyword=None):
+        if alpha_key is not None:
+            self.alpha_key = alpha_key
+        if keyword is not None:
+            self.keyword = keyword
+
+    def calculate(self, *, keyword=None):
+        keys = create_caesar_keyword_keys(keyword)
+        self.set(**keys)
+
     def validate(self, alphabet=Cipher.ALPHABET):
         try:
             keys = create_caesar_keyword_keys(self.keyword)

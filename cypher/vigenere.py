@@ -42,6 +42,15 @@ class VigenereKey(Key):
         self.keyword = keyword
         self.key_list = key_list
 
+    def set(self, *, keyword=None, key_list=None):
+        if keyword is not None:
+            self.keyword = keyword
+        if key_list is not None:
+            self.key_list = key_list
+
+    def calculate(self, *, keyword=None):
+        self.key_list = create_key_list(keyword)
+
     def validate(self, alphabet=Cipher.ALPHABET):
         if self.keyword is None and self.key_list is None:
             self.keyword = get_random_word('pokemon')
