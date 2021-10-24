@@ -123,3 +123,14 @@ def output_to_file(source, output_file):
     except Exception as e:
         print(f'There was an error with the output file.')
         print(f'Error: {e}')
+
+
+def validate_one_kwarg(**kwargs):
+    count = 0
+    valid = True
+    for kwarg in kwargs:
+        if kwarg is not None:
+            count += 1
+    if count != 1:
+        valid = False
+    return valid
