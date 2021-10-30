@@ -242,7 +242,8 @@ class KeyGUI:
             self.variable_keyword.set(key.keyword)
 
     def clear_key_button(self):
-        self.scale_numeric_key.set(0)
+        if type(key) == CaesarKey:
+            self.scale_numeric_key.set(0)
         for variable in self.__dict__.values():
             if type(variable) == StringVar:
                 variable.set('')
@@ -305,7 +306,6 @@ class CipherGUI:
         self.label_ciphertext.grid(column=0, row=3, **balanced_grid_kwargs)
         self.text_ciphertext.grid(column=0, row=4, columnspan=3, **balanced_grid_kwargs)
         self.button_clear_ciphertext.grid(column=0, row=5, **balanced_grid_kwargs)
-        # self.button_random_ciphertext.grid(column=1, row=5, **balanced_grid_kwargs)
         self.button_decrypt.grid(column=2, row=5, **balanced_grid_kwargs)
 
         # Place frames
