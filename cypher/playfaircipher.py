@@ -1,5 +1,5 @@
 from cypher.cipher import Cipher, Key
-from cypher.utilities import string_remove_duplicates, list_remove_duplicates, get_random_word, break_string
+from cypher.tools.utilities import string_remove_duplicates, list_remove_duplicates, get_random_word, break_string
 
 
 def find_letter(letter, key_table):

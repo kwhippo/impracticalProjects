@@ -1,5 +1,5 @@
 from cypher.cipher import Cipher
-from cypher.utilities import get_random_word
+from cypher.tools.utilities import get_random_word
 from cypher.substitution import SubstitutionKey, SubstitutionCipher
 
 

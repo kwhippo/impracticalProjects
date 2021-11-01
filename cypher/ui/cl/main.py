@@ -1,5 +1,5 @@
 import cypher.cipher
-import cypher.ui.cl_substitution
+import cypher.ui.cl.cl_substitution
 import cypher.tools
 import piglatin
 import reverse_cipher
@@ -22,7 +22,7 @@ def main():
         elif option == 'route cipher':
             route_cipher.main()
         elif option == 'substitution cipher':
-            cypher.ui.cl_substitution.cl_main()
+            cypher.ui.cl.cl_substitution.cl_main()
         elif option == 'reverse cipher':
             reverse_cipher.main()
         else:

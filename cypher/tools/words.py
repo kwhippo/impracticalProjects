@@ -24,7 +24,7 @@ def find_words(source):
     text = source
     phrase_candidates = []
 
-    with open('../text_sources/words_alpha.txt', 'r') as p:
+    with open('text_sources/words_alpha.txt', 'r') as p:
         lines = p.readlines()
         words = [line.strip() for line in lines]
 

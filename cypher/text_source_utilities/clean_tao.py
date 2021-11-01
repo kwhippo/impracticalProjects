@@ -1,4 +1,4 @@
-with open('../text_sources/taoteching_original.txt', 'r') as f:
+with open('../tools/text_sources/taoteching_original.txt', 'r') as f:
     new = []
     section = []
     for line in f.readlines():

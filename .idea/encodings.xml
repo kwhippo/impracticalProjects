@@ -2,12 +2,11 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/cypher/substitution.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/cypher/text_sources/callofcthulhu.txt" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/cypher/text_sources/shakespeare.txt" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/cypher/utilities.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/cypher/utilities.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/docstrings.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/tests/test.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cypher/tests/test.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cypher/tools/docstrings.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cypher/tools/text_sources/callofcthulhu.txt" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/cypher/tools/text_sources/shakespeare.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cypher/tools/utilities.py" charset="UTF-8" />
     <file url="PROJECT" charset="windows-1252" />
   </component>
 </project>

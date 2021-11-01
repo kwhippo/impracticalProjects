@@ -1,6 +1,6 @@
 from cypher.caesar import create_keys
 from cypher.cipher import Cipher, Key
-from cypher.utilities import get_random_word
+from cypher.tools.utilities import get_random_word
 from cypher import substitution
 
 

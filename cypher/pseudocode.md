@@ -53,3 +53,52 @@ Method to encrypt plaintext to ciphertext using key.
 
 #### Decrypt
 Method to decrypt ciphertext from plaintext using key.
+
+## To Do List
+- [ ] Add tests
+- [ ] Create Utilities UI
+- [ ] Refactor Alphabet to Keys from Ciphers
+- [ ] Add validation and error handling in UI
+- [ ] Refactor Route Cipher
+- [ ] Refactor Reverse Cipher
+- [ ] Handle spaces & punctuation in keywords
+- [ ] Add word separation to Playfair Cipher
+- [ ] Add decryption to Pig Latin
+- [ ] Add reverse option to Caesar Cipher (Atbash Cipher)
+- [ ] Add numeric_key = 13 to Caesar Cipher (ROT13)
+- [ ] Add reverse option to Caesar Keyword Cipher
+- [ ] Add uppercase/lower case options
+- [ ] Add salt options
+- [ ] Add brute force decryption
+- [ ] Add more ciphers!
+
+## Additional Ciphers
+- [ ] Rail Fence
+- [ ] Autokey
+- [ ] Simple Transposition/Scytale
+- [ ] Columnar Transposition
+- [ ] One-Pad/Running Key
+- [ ] Textbook RSA
+- [ ] Multiplicative
+- [ ] Affine
+- [ ] Atbash
+- [ ] Baconian
+- [ ] Polybius Square
+- [ ] Beaufort
+- [ ] Porta
+- [ ] Homophonic Substitution
+- [ ] Four-Square Cipher
+- [ ] Hill
+- [ ] ADFGX/ADFVGX
+- [ ] Bifid/Trifid
+- [ ] Straddle Checkerboard
+- [ ] Base64
+- [ ] Code Book
+- [ ] Morse
+- [ ] Fractionated Morse
+- [ ] Ave Maria
+- [ ] Enigma
+- [ ] Oppish
+- [ ] Gibberish
+- [ ] Ubbi Dubbi
+- [ ] Double Dutch
