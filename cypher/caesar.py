@@ -86,29 +86,31 @@ class CaesarKey(SubstitutionKey):
                 keys = create_keys(alpha_key)
                 keys['alpha_key'] = alpha_key
                 self.set(**keys)
-            if numeric_key is not None:
+            elif numeric_key is not None:
                 assert alpha_key is None
                 assert ab_key is None
                 assert a_key is None
                 keys = create_keys(numeric_key)
                 keys['numeric_key'] = numeric_key
                 self.set(**keys)
-            if ab_key is not None:
+            elif ab_key is not None:
                 assert alpha_key is None
                 assert numeric_key is None
                 assert a_key is None
                 keys = create_keys(ab_key)
                 keys['ab_key'] = ab_key
                 self.set(**keys)
-            if a_key is not None:
+            elif a_key is not None:
                 assert alpha_key is None
                 assert numeric_key is None
                 assert ab_key is None
                 keys = create_keys(a_key)
                 keys['a_key'] = a_key
                 self.set(**keys)
+            else:
+                raise AssertionError
         except AssertionError:
-            raise AssertionError('Calculate method only expects 1 keyword argument')
+            raise AssertionError('Calculate method expects exactly 1 keyword argument')
 
     def validate(self, alphabet=Cipher.ALPHABET):
         validation_key = None
