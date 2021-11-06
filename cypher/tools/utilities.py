@@ -1,6 +1,12 @@
 import os
 import random
 
+SOURCE_FILES = {
+    'common': 'text_sources/words_common.txt',
+    'extended': 'text_sources/words.txt',
+    'pokemon': 'text_sources/pokemon.txt',
+}
+
 
 def list_remove_duplicates(original_list):
     new_list = []
@@ -47,15 +53,10 @@ def get_factors(number):
 
 
 def get_random_word(source=None):
-    source_files = {
-        'common': 'text_sources/words_common.txt',
-        'extended': 'text_sources/words.txt',
-        'pokemon': 'text_sources/pokemon.txt',
-    }
-    if source in source_files:
-        file = source_files[source]
+    if source in SOURCE_FILES:
+        file = SOURCE_FILES[source]
     else:
-        file = source_files['common']
+        file = SOURCE_FILES['common']
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     with open(os.path.join(__location__, file), 'r') as words_file:
         word = random.choice(words_file.readlines())
