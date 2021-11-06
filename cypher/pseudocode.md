@@ -36,7 +36,7 @@ May also break text into a list or table.
 #### Validate Key
 Method to validate key attributes.
 
-#### Generate Key
+#### Calculate Key
 Method to calculate key attributes from an input key attribute or create random key.
 
 ### Cipher
