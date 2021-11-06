@@ -1,18 +1,26 @@
-from cypher.caesar import CaesarKey
-from cypher.substitution import SubstitutionKey
+from cypher.route_cipher import RouteKey, recommended_grid
+from cypher.tools.utilities import get_factors
 from pprint import pprint
 
-k = CaesarKey()
-k.calculate(numeric_key=1)
-k.print()
-k.calculate(ab_key='AB')
-k.print()
-k.calculate(a_key='B')
-k.print()
-k.calculate(alpha_key='BCDEFGHIJKLMNOPQRSTUVWXYZA')
-k.print()
-print(type(k) == SubstitutionKey)
+tl = 21
 
-pt = 'Hide the gold in the stump'
+pprint(get_factors(tl))
+print(recommended_grid(tl))
+
+kl = [-1, 3, -2, 4]
+ks = '-1 3 -2 4'
+cols = 4
 
 
+k = RouteKey()
+k.calculate(key_list=kl)
+k.print()
+
+k.calculate(key_string=ks)
+k.print()
+
+k.calculate(columns=cols)
+k.print()
+
+k.calculate(best_fit_length=tl)
+k.print()
