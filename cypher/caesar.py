@@ -147,4 +147,7 @@ class CaesarCipher(SubstitutionCipher):
         super(CaesarCipher, self).set_key(key)
 
     def clear_key(self):
-        self.key = CaesarKey()
+        if self.key.reverse:
+            self.key = CaesarKey(reverse=True)
+        else:
+            self.key = CaesarKey()
