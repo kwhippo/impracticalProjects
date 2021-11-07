@@ -54,7 +54,8 @@ class App:
         substitution_menu = Menu(cipher_menu)
         substitution_menu.add_command(label='Simple Substitution',
                                       command=lambda: self.setup_mainframe(mainframe.SimpleSubstitutionFrame))
-        substitution_menu.add_command(label='Caesar')
+        substitution_menu.add_command(label='Caesar',
+                                      command=lambda: self.setup_mainframe(mainframe.CaesarFrame))
         substitution_menu.add_command(label='ROT13')
         substitution_menu.add_command(label='Caesar Keyword')
         substitution_menu.add_command(label='Caesar Reverse')

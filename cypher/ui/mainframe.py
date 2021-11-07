@@ -1,9 +1,10 @@
 from tkinter import *
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
-from cypher.cipher import Cipher, Key
-from cypher.substitution import SubstitutionCipher
 from cypher.tools.utilities import get_random_fortune
+from cypher.cipher import Cipher
+from cypher.substitution import SubstitutionCipher
+from cypher.caesar import CaesarCipher
 
 balanced_grid_kwargs = {'sticky': (N, S, E, W), 'pady': 5, 'padx': 5}
 pad_5_kwargs = {'pady': 5, 'padx': 5}
@@ -122,9 +123,8 @@ class CipherFrame(Mainframe):
 
 class SimpleSubstitutionFrame(CipherFrame):
     def __init__(self, master):
-        # Configure Key Frame
         super().__init__(master, SubstitutionCipher)
-
+        # Configure Key Frame
         # Setup Key Variables
         self.variable_alpha_key = StringVar()
 
@@ -143,3 +143,90 @@ class SimpleSubstitutionFrame(CipherFrame):
     def clear_key_button(self):
         super(SimpleSubstitutionFrame, self).clear_key_button()
         self.variable_alpha_key.set(self.cipher.key.alpha_key)
+
+
+class CaesarFrame(CipherFrame):
+    def __init__(self, master):
+        super(CaesarFrame, self).__init__(master, CaesarCipher)
+        # Configure Key Frame
+        # Setup Key Variables
+        self.variable_alpha_key = StringVar()
+        self.variable_numeric_key = StringVar()
+        self.variable_ab_key = StringVar()
+        self.variable_a_key = StringVar()
+        self.variable_numeric_scale = StringVar()
+
+        # Setup Key Variable Widgets
+        label_alpha_key = ttk.Label(self.frame_key_variables, text='Alpha Key')
+        entry_alpha_key = ttk.Entry(self.frame_key_variables, width=32, textvariable=self.variable_alpha_key)
+        entry_alpha_key.state(['readonly'])
+        label_numeric_key = ttk.Label(self.frame_key_variables, text='Numeric Key')
+        spinbox_numeric_key = ttk.Spinbox(self.frame_key_variables, from_=-100.0, to=100.0, width=5,
+                                          format='%3.0f',
+                                          textvariable=self.variable_numeric_key,
+                                          command=self.spinbox_numeric_key_incremented)
+        self.variable_numeric_key.trace_add('write', self.write_variable_numeric_key)
+        label_ab_key = ttk.Label(self.frame_key_variables, text='AB Key')
+        combobox_ab_key = ttk.Combobox(self.frame_key_variables, width=4, textvariable=self.variable_ab_key)
+        values_ab_key = []
+        for a in self.cipher.alphabet:
+            for b in self.cipher.alphabet:
+                values_ab_key.append(f'{a}{b}')
+        combobox_ab_key['values'] = values_ab_key
+        combobox_ab_key.state(['readonly'])
+        combobox_ab_key.bind('<<ComboboxSelected>>', lambda e: self.combobox_ab_key_selected())
+        label_a_key = ttk.Label(self.frame_key_variables, text='A Key')
+        combobox_a_key = ttk.Combobox(self.frame_key_variables, width=3, textvariable=self.variable_a_key)
+        combobox_a_key['values'] = list(self.cipher.alphabet)
+        combobox_a_key.state(['readonly'])
+        combobox_a_key.bind('<<ComboboxSelected>>', lambda e: self.combobox_a_key_selected())
+        scale_numeric_key = ttk.Scale(self.frame_key_variables, orient=HORIZONTAL, length=100,
+                                      from_=0.0, to=25.0, variable=self.variable_numeric_scale,
+                                      command=self.update_scale_numeric_key)
+
+        # Place Key Variable Widgets
+        label_alpha_key.grid(row=0, column=0, sticky=E, **pad_5_kwargs)
+        entry_alpha_key.grid(row=0, column=1, columnspan=3, sticky=W, **pad_5_kwargs)
+        label_numeric_key.grid(row=1, column=0, **pad_5_kwargs, sticky=E)
+        spinbox_numeric_key.grid(row=1, column=1, **pad_5_kwargs, sticky=W, )
+        label_ab_key.grid(row=1, column=2, **pad_5_kwargs, sticky=E)
+        combobox_ab_key.grid(row=1, column=3, **pad_5_kwargs, sticky=W)
+        label_a_key.grid(row=3, column=0, **pad_5_kwargs, sticky=E)
+        combobox_a_key.grid(row=3, column=1, **pad_5_kwargs, sticky=W)
+        scale_numeric_key.grid(row=3, column=2, columnspan=2, **pad_5_kwargs)
+
+    def set_key_variables(self):
+        self.variable_alpha_key.set(self.cipher.key.alpha_key)
+        self.variable_numeric_key.set(self.cipher.key.numeric_key)
+        self.variable_numeric_scale.set(self.cipher.key.numeric_key % 26)
+        self.variable_ab_key.set(self.cipher.key.ab_key)
+        self.variable_a_key.set(self.cipher.key.a_key)
+
+    def random_key_button(self):
+        super(CaesarFrame, self).random_key_button()
+        self.set_key_variables()
+
+    def clear_key_button(self):
+        super(CaesarFrame, self).clear_key_button()
+        self.set_key_variables()
+
+    def update_scale_numeric_key(self, value):
+        self.cipher.key.calculate(numeric_key=int(float(value)))
+        self.set_key_variables()
+
+    def write_variable_numeric_key(self, *args):
+        if self.variable_numeric_key.get() != '':
+            self.cipher.key.calculate(numeric_key=int(self.variable_numeric_key.get()))
+            self.set_key_variables()
+
+    def combobox_ab_key_selected(self):
+        self.cipher.key.calculate(ab_key=self.variable_ab_key.get())
+        self.set_key_variables()
+
+    def combobox_a_key_selected(self):
+        self.cipher.key.calculate(a_key=self.variable_a_key.get())
+        self.set_key_variables()
+
+    def spinbox_numeric_key_incremented(self):
+        self.cipher.key.calculate(numeric_key=int(self.variable_numeric_key.get()))
+        self.set_key_variables()
