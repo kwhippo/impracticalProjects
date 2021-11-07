@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from cypher.substitution import SubstitutionCipher, SubstitutionKey, random_substitution_key
+from cypher.substitution import SubstitutionCipher, SubstitutionKey, random_alpha_key
 from cypher.utilities import get_random_fortune
 
 # Setup Main Application Window
@@ -53,7 +53,7 @@ ttk.Label(mainframe, text='Random Substitution Cipher').grid(column=1, row=1, st
 
 # Key Section
 def random_alpha_key():
-    alpha_key.set(random_substitution_key())
+    alpha_key.set(random_alpha_key())
 
 
 keyframe = ttk.Labelframe(mainframe, text='Key')
