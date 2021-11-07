@@ -1,12 +1,11 @@
-from cypher.cipher import Key, Cipher
+from cypher.caesar import CaesarKey, create_keys
 from pprint import pprint
 
-k = Key()
-k.key_variable = None
-# k.validate()
-
-c = Cipher(plaintext='testing')
-try:
-    c.encrypt()
-except Exception as e:
-    print(e)
+k = CaesarKey()
+k.random()
+k.validate()
+k.print()
+a = k.a_key
+ab = k.ab_key
+alpha = k.alpha_key
+n = k.numeric_key
