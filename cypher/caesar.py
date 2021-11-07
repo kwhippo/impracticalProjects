@@ -61,7 +61,7 @@ def get_key_type(input_key, alphabet=Cipher.ALPHABET):
 
 
 class CaesarKey(SubstitutionKey):
-    def __init__(self, numeric_key=None, ab_key=None, a_key=None, *args, **kwargs):
+    def __init__(self, numeric_key=0, ab_key='', a_key='', *args, **kwargs):
         super(CaesarKey, self).__init__(*args, **kwargs)
         self.numeric_key = numeric_key
         self.ab_key = ab_key
@@ -112,6 +112,10 @@ class CaesarKey(SubstitutionKey):
         except AssertionError:
             raise AssertionError('Calculate method expects exactly 1 keyword argument')
 
+    def random(self):
+        keys = create_keys()
+        self.set(**keys)
+
     def validate(self, alphabet=Cipher.ALPHABET):
         validation_key = None
         for key_name, key_value in self.__dict__.items():
@@ -132,4 +136,10 @@ class CaesarKey(SubstitutionKey):
 
 
 class CaesarCipher(SubstitutionCipher):
-    NAME = 'Caesar'
+    NAME = 'Caesar Cipher'
+
+    def set_key(self, key=CaesarKey()):
+        super(CaesarCipher, self).set_key(key)
+
+    def clear_key(self):
+        self.key = CaesarKey()
