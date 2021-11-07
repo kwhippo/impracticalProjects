@@ -1,0 +1,6 @@
+
+Bandercrypt is a python and tkinter project that implements numerous encryption and decryption algorithms. The list is constantly growing and the algorithms are regularly being improved to follow standard coding guidelines, increase efficiency, and implement best practices for python development.
+
+The program gets its name from the frumious Bandersnatch, a creature that first appeared in Lewis Carroll's 1871 novel "Through the Looking-Glass" and has since made appearances in various adaptations of Carroll's works. In addition to his well known literary works, Carroll also published a number of mathematical works including an article titled "The Alphabet Cipher" in 1868. This article describes the well-known polyalphabetic substitution cipher known as the Vigenere cipher first described in 1553 by Giovan Battista Bellaso. While Carroll claimed this cipher was unbreakable, this program aims to disprove that theory. In fact, methods to crack the Vigenere cipher were first published 5 years prior to Carroll's article.
+
+Please enjoy this program and happy crypting!
