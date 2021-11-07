@@ -58,9 +58,11 @@ class App:
                                       command=lambda: self.setup_mainframe(mainframe.CaesarFrame))
         substitution_menu.add_command(label='ROT13',
                                       command=lambda: self.setup_mainframe(mainframe.ROT13Frame))
+        substitution_menu.add_command(label='Caesar Reverse',
+                                      command=lambda: self.setup_mainframe(mainframe.ReverseCaesarFrame))
+        substitution_menu.add_command(label='Atbash',
+                                      command=lambda: self.setup_mainframe(mainframe.AtbashFrame))
         substitution_menu.add_command(label='Caesar Keyword')
-        substitution_menu.add_command(label='Caesar Reverse')
-        substitution_menu.add_command(label='Atbash')
         substitution_menu.add_command(label='Morse')
         substitution_menu.add_command(label='Homophonic Substitution')
         substitution_menu.add_command(label='One-Pad')

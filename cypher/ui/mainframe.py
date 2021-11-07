@@ -247,3 +247,27 @@ class ROT13Frame(CaesarFrame):
 
         self.cipher.key.calculate(numeric_key=13)
         self.set_key_variables()
+
+
+class ReverseCaesarFrame(CaesarFrame):
+    def __init__(self, master):
+        super(ReverseCaesarFrame, self).__init__(master)
+        self.label_title.config(text='Reverse Caesar Cipher')
+        self.cipher.key.reverse = True
+
+
+class AtbashFrame(CaesarFrame):
+    def __init__(self, master):
+        super(AtbashFrame, self).__init__(master)
+        self.label_title.config(text='Atbash Cipher')
+        self.cipher.key.reverse = True
+
+        self.spinbox_numeric_key.state(['disabled'])
+        self.combobox_ab_key.state(['disabled'])
+        self.combobox_a_key.state(['disabled'])
+        self.scale_numeric_key.state(['disabled'])
+        self.button_clear_key.state(['disabled'])
+        self.button_random_key.state(['disabled'])
+
+        self.cipher.key.calculate(numeric_key=0)
+        self.set_key_variables()
