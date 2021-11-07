@@ -3,7 +3,7 @@ import random
 import cypher.tools
 from cypher.caesar import input_caesar_key, create_caesar_key
 from cypher.caesar_keyword import input_keyword_key, create_keyword_key
-from cypher.substitution import encrypt, decrypt, ALPHABET, CIPHERS, random_substitution_key
+from cypher.substitution import encrypt, decrypt, ALPHABET, CIPHERS, random_alpha_key
 
 
 def cl_encrypt_text():
@@ -84,7 +84,7 @@ def cl_input_cipher_key():
             elif cipher == 'keyword':
                 keys = input_keyword_key()
             elif cipher == 'random':
-                keys = random_substitution_key()
+                keys = random_alpha_key()
             else:
                 cipher = random.choice(CIPHERS)
                 known = False
@@ -93,6 +93,6 @@ def cl_input_cipher_key():
                 elif cipher == 'keyword':
                     keys = create_keyword_key()
                 else:
-                    keys = random_substitution_key()
+                    keys = random_alpha_key()
 
     return keys, cipher, known
