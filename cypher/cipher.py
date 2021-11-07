@@ -1,4 +1,5 @@
 import pprint
+from cypher.exceptions import KeyValidationError, IncompleteKeyError
 
 
 class Key:
@@ -11,7 +12,7 @@ class Key:
     def validate(self):
         for key_name, key_value in self.__dict__.items():
             if key_value is None:
-                raise ValueError(f'{key_name} must have a value')
+                raise IncompleteKeyError(f'{key_name} must have a value')
 
     def random(self):
         for key_name in self.__dict__.keys():
@@ -33,12 +34,20 @@ class Cipher:
         self.key = key
 
     def encrypt(self):
-        self.key.validate()
-        self.ciphertext = self.plaintext.upper()
+        try:
+            self.key.validate()
+            self.ciphertext = self.plaintext.upper()
+        except Exception:
+            self.ciphertext = ''
+            raise KeyValidationError
 
     def decrypt(self):
-        self.key.validate()
-        self.plaintext = self.ciphertext.upper()
+        try:
+            self.key.validate()
+            self.plaintext = self.ciphertext.upper()
+        except Exception:
+            self.plaintext = ''
+            raise KeyValidationError
 
     def print(self):
         print(f'Alphabet: {self.alphabet}')
@@ -46,3 +55,9 @@ class Cipher:
         print(f'Ciphertext: {self.ciphertext}')
         print('Key:', end=' ')
         self.key.print()
+
+    def set_key(self, key=Key()):
+        self.key = key
+
+    def clear_key(self):
+        self.key = Key()
