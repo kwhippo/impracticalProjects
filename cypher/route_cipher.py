@@ -239,21 +239,19 @@ class RouteCipher(Cipher):
 
 
 if __name__ == '__main__':
-    # PLAINTEXT = "All the world's a stage, And & all the men and women merely players;"
-    # CIPHERTEXT = 'PLANE WOMEN A ALL FUDGEL FISH WORLDS AND EDGE CROSS PLAYERS AND ALL THE FLOW THICK' \
-    #              ' MERELY STAGE DURING MEN THE'
-    # KEY_STRING = '-4 7 3 -6 1 -5 -2'
-    # k = RouteKey(key_string=KEY_STRING, block='word', noise=True)
-    # c = RouteCipher(plaintext=PLAINTEXT, key=k)
-    # c.encrypt()
-    # if CIPHERTEXT == c.ciphertext:
-    #     print('Successful encryption!')
-    # else:
-    #     print('Failed encryption :(')
-    # c.decrypt()
-    # if PLAINTEXT.upper() == c.plaintext:
-    #     print('Successful decryption!')
-    # else:
-    #     print('Failed decryption :(')
-    ks = '-1 2'
-    validate_key_string(ks)
+    PLAINTEXT = "All the world's a stage, And & all the men and women merely players;"
+    CIPHERTEXT = 'PLANE WOMEN A ALL FUDGEL FISH WORLDS AND EDGE CROSS PLAYERS AND ALL THE FLOW THICK' \
+                 ' MERELY STAGE DURING MEN THE'
+    KEY_STRING = '-4 7 3 -6 1 -5 -2'
+    k = RouteKey(key_string=KEY_STRING, block='word', noise=True)
+    c = RouteCipher(plaintext=PLAINTEXT, key=k)
+    c.encrypt()
+    if CIPHERTEXT == c.ciphertext:
+        print('Successful encryption!')
+    else:
+        print('Failed encryption :(')
+    c.decrypt()
+    if PLAINTEXT.upper() == c.plaintext:
+        print('Successful decryption!')
+    else:
+        print('Failed decryption :(')
