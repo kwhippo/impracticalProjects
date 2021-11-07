@@ -56,7 +56,8 @@ class App:
                                       command=lambda: self.setup_mainframe(mainframe.SimpleSubstitutionFrame))
         substitution_menu.add_command(label='Caesar',
                                       command=lambda: self.setup_mainframe(mainframe.CaesarFrame))
-        substitution_menu.add_command(label='ROT13')
+        substitution_menu.add_command(label='ROT13',
+                                      command=lambda: self.setup_mainframe(mainframe.ROT13Frame))
         substitution_menu.add_command(label='Caesar Keyword')
         substitution_menu.add_command(label='Caesar Reverse')
         substitution_menu.add_command(label='Atbash')

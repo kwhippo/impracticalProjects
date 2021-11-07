@@ -18,7 +18,8 @@ class Mainframe:
 
         self.style = ttk.Style()
         self.style.configure('Header.TLabel', font=('TkDefaultFont', 14, 'bold'))
-        ttk.Label(self.title_frame, text=f'{title}', style='Header.TLabel').pack()
+        self.label_title = ttk.Label(self.title_frame, text=f'{title}', style='Header.TLabel')
+        self.label_title.pack()
 
         self.title_frame.pack(pady=(10, 0))
         self.content_frame.pack(pady=10)
@@ -158,42 +159,42 @@ class CaesarFrame(CipherFrame):
 
         # Setup Key Variable Widgets
         label_alpha_key = ttk.Label(self.frame_key_variables, text='Alpha Key')
-        entry_alpha_key = ttk.Entry(self.frame_key_variables, width=32, textvariable=self.variable_alpha_key)
-        entry_alpha_key.state(['readonly'])
+        self.entry_alpha_key = ttk.Entry(self.frame_key_variables, width=32, textvariable=self.variable_alpha_key)
+        self.entry_alpha_key.state(['readonly'])
         label_numeric_key = ttk.Label(self.frame_key_variables, text='Numeric Key')
-        spinbox_numeric_key = ttk.Spinbox(self.frame_key_variables, from_=-100.0, to=100.0, width=5,
-                                          format='%3.0f',
-                                          textvariable=self.variable_numeric_key,
-                                          command=self.spinbox_numeric_key_incremented)
+        self.spinbox_numeric_key = ttk.Spinbox(self.frame_key_variables, from_=-100.0, to=100.0, width=5,
+                                               format='%3.0f',
+                                               textvariable=self.variable_numeric_key,
+                                               command=self.spinbox_numeric_key_incremented)
         self.variable_numeric_key.trace_add('write', self.write_variable_numeric_key)
         label_ab_key = ttk.Label(self.frame_key_variables, text='AB Key')
-        combobox_ab_key = ttk.Combobox(self.frame_key_variables, width=4, textvariable=self.variable_ab_key)
+        self.combobox_ab_key = ttk.Combobox(self.frame_key_variables, width=4, textvariable=self.variable_ab_key)
         values_ab_key = []
         for a in self.cipher.alphabet:
             for b in self.cipher.alphabet:
                 values_ab_key.append(f'{a}{b}')
-        combobox_ab_key['values'] = values_ab_key
-        combobox_ab_key.state(['readonly'])
-        combobox_ab_key.bind('<<ComboboxSelected>>', lambda e: self.combobox_ab_key_selected())
+        self.combobox_ab_key['values'] = values_ab_key
+        self.combobox_ab_key.state(['readonly'])
+        self.combobox_ab_key.bind('<<ComboboxSelected>>', lambda e: self.combobox_ab_key_selected())
         label_a_key = ttk.Label(self.frame_key_variables, text='A Key')
-        combobox_a_key = ttk.Combobox(self.frame_key_variables, width=3, textvariable=self.variable_a_key)
-        combobox_a_key['values'] = list(self.cipher.alphabet)
-        combobox_a_key.state(['readonly'])
-        combobox_a_key.bind('<<ComboboxSelected>>', lambda e: self.combobox_a_key_selected())
-        scale_numeric_key = ttk.Scale(self.frame_key_variables, orient=HORIZONTAL, length=100,
-                                      from_=0.0, to=25.0, variable=self.variable_numeric_scale,
-                                      command=self.update_scale_numeric_key)
+        self.combobox_a_key = ttk.Combobox(self.frame_key_variables, width=3, textvariable=self.variable_a_key)
+        self.combobox_a_key['values'] = list(self.cipher.alphabet)
+        self.combobox_a_key.state(['readonly'])
+        self.combobox_a_key.bind('<<ComboboxSelected>>', lambda e: self.combobox_a_key_selected())
+        self.scale_numeric_key = ttk.Scale(self.frame_key_variables, orient=HORIZONTAL, length=100,
+                                           from_=0.0, to=25.0, variable=self.variable_numeric_scale,
+                                           command=self.update_scale_numeric_key)
 
         # Place Key Variable Widgets
         label_alpha_key.grid(row=0, column=0, sticky=E, **pad_5_kwargs)
-        entry_alpha_key.grid(row=0, column=1, columnspan=3, sticky=W, **pad_5_kwargs)
+        self.entry_alpha_key.grid(row=0, column=1, columnspan=3, sticky=W, **pad_5_kwargs)
         label_numeric_key.grid(row=1, column=0, **pad_5_kwargs, sticky=E)
-        spinbox_numeric_key.grid(row=1, column=1, **pad_5_kwargs, sticky=W, )
+        self.spinbox_numeric_key.grid(row=1, column=1, **pad_5_kwargs, sticky=W, )
         label_ab_key.grid(row=1, column=2, **pad_5_kwargs, sticky=E)
-        combobox_ab_key.grid(row=1, column=3, **pad_5_kwargs, sticky=W)
+        self.combobox_ab_key.grid(row=1, column=3, **pad_5_kwargs, sticky=W)
         label_a_key.grid(row=3, column=0, **pad_5_kwargs, sticky=E)
-        combobox_a_key.grid(row=3, column=1, **pad_5_kwargs, sticky=W)
-        scale_numeric_key.grid(row=3, column=2, columnspan=2, **pad_5_kwargs)
+        self.combobox_a_key.grid(row=3, column=1, **pad_5_kwargs, sticky=W)
+        self.scale_numeric_key.grid(row=3, column=2, columnspan=2, **pad_5_kwargs)
 
     def set_key_variables(self):
         self.variable_alpha_key.set(self.cipher.key.alpha_key)
@@ -229,4 +230,20 @@ class CaesarFrame(CipherFrame):
 
     def spinbox_numeric_key_incremented(self):
         self.cipher.key.calculate(numeric_key=int(self.variable_numeric_key.get()))
+        self.set_key_variables()
+
+
+class ROT13Frame(CaesarFrame):
+    def __init__(self, master):
+        super(ROT13Frame, self).__init__(master)
+        self.label_title.config(text='ROT13 Cipher')
+
+        self.spinbox_numeric_key.state(['disabled'])
+        self.combobox_ab_key.state(['disabled'])
+        self.combobox_a_key.state(['disabled'])
+        self.scale_numeric_key.state(['disabled'])
+        self.button_clear_key.state(['disabled'])
+        self.button_random_key.state(['disabled'])
+
+        self.cipher.key.calculate(numeric_key=13)
         self.set_key_variables()
