@@ -294,7 +294,6 @@ class CipherGUI:
         self.text_ciphertext = Text(self.frame_cipher, width=50, height=10, wrap='word')
         self.button_clear_ciphertext = ttk.Button(self.frame_cipher, text='Clear',
                                                   command=lambda: self.text_ciphertext.delete('1.0', END))
-        # self.button_random_ciphertext = ttk.Button(self.frame_cipher, text='Random')
         self.button_decrypt = ttk.Button(self.frame_cipher, text='Decrypt', command=self.decrypt_button)
 
         self.label_plaintext.grid(column=0, row=0, **balanced_grid_kwargs)
