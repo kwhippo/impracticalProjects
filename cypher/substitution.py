@@ -3,7 +3,7 @@ from cypher.cipher import Key, Cipher
 
 
 # Utility Functions
-def random_substitution_key():
+def random_alpha_key():
     key_list = list(Cipher.ALPHABET)
     random.shuffle(key_list)
     alpha_key = ''.join(key_list)
@@ -22,13 +22,14 @@ def crypt(text, source_alphabet, crypted_alphabet):
 
 # Cipher Definition
 class SubstitutionKey(Key):
-    def __init__(self, alpha_key=None):
+    def __init__(self, alpha_key=''):
         super().__init__()
         self.alpha_key = alpha_key
 
+    def random(self):
+        self.alpha_key = random_alpha_key()
+
     def validate(self, alphabet=Cipher.ALPHABET):
-        if self.alpha_key is None:
-            self.alpha_key = random_substitution_key()
         try:
             validated = self.alpha_key.upper()
             key_set = set(validated)
@@ -42,7 +43,7 @@ class SubstitutionKey(Key):
 
 
 class SubstitutionCipher(Cipher):
-    NAME = 'Simple Substitution'
+    NAME = 'Simple Substitution Cipher'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -56,3 +57,9 @@ class SubstitutionCipher(Cipher):
         super(SubstitutionCipher, self).decrypt()
         ciphertext = self.ciphertext.upper()
         self.plaintext = crypt(ciphertext, self.key.alpha_key, self.alphabet)
+
+    def set_key(self, key=SubstitutionKey()):
+        super(SubstitutionCipher, self).set_key(key)
+
+    def clear_key(self):
+        self.key = SubstitutionKey()
