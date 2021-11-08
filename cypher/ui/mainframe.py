@@ -7,6 +7,7 @@ from cypher.substitution import SubstitutionCipher
 from cypher.caesar import CaesarCipher
 from cypher.caesar_keyword import CaesarKeywordCipher
 from cypher.vigenere import VigenereCipher
+from cypher.playfair import PlayfairCipher
 
 balanced_grid_kwargs = {'sticky': (N, S, E, W), 'pady': 5, 'padx': 5}
 pad_5_kwargs = {'pady': 5, 'padx': 5}
@@ -119,9 +120,14 @@ class CipherFrame(Mainframe):
 
     def random_key_button(self):
         self.cipher.key.random()
+        self.set_key_variables()
 
     def clear_key_button(self):
         self.cipher.clear_key()
+        self.set_key_variables()
+
+    def set_key_variables(self):
+        pass
 
 
 class SimpleSubstitutionFrame(CipherFrame):
@@ -139,12 +145,7 @@ class SimpleSubstitutionFrame(CipherFrame):
         label_alpha_key.grid(row=0, column=0, sticky=E, **pad_5_kwargs)
         entry_alpha_key.grid(row=0, column=1, sticky=W, **pad_5_kwargs)
 
-    def random_key_button(self):
-        super(SimpleSubstitutionFrame, self).random_key_button()
-        self.variable_alpha_key.set(self.cipher.key.alpha_key)
-
-    def clear_key_button(self):
-        super(SimpleSubstitutionFrame, self).clear_key_button()
+    def set_key_variables(self):
         self.variable_alpha_key.set(self.cipher.key.alpha_key)
 
 
@@ -204,14 +205,6 @@ class CaesarFrame(CipherFrame):
         self.variable_numeric_scale.set(self.cipher.key.numeric_key % 26)
         self.variable_ab_key.set(self.cipher.key.ab_key)
         self.variable_a_key.set(self.cipher.key.a_key)
-
-    def random_key_button(self):
-        super(CaesarFrame, self).random_key_button()
-        self.set_key_variables()
-
-    def clear_key_button(self):
-        super(CaesarFrame, self).clear_key_button()
-        self.set_key_variables()
 
     def update_scale_numeric_key(self, value):
         self.cipher.key.calculate(numeric_key=int(float(value)))
@@ -302,23 +295,15 @@ class CaesarKeywordFrame(CipherFrame):
         self.variable_alpha_key.set(self.cipher.key.alpha_key)
         self.variable_keyword.set(self.cipher.key.keyword)
 
-    def random_key_button(self):
-        super(CaesarKeywordFrame, self).random_key_button()
-        self.set_key_variables()
-
-    def clear_key_button(self):
-        super(CaesarKeywordFrame, self).clear_key_button()
-        self.set_key_variables()
-
     def write_variable_keyword(self, *args):
         if self.variable_keyword.get() != '':
             self.cipher.key.calculate(keyword=self.variable_keyword.get())
             self.set_key_variables()
 
 
-class VigenereFrame(CipherFrame):
-    def __init__(self, master):
-        super().__init__(master, VigenereCipher)
+class KeywordFrame(CipherFrame):
+    def __init__(self, master, cipher=Cipher):
+        super().__init__(master, cipher)
         # Configure Key Frame
         # Setup Key Variables
         self.variable_keyword = StringVar()
@@ -331,10 +316,51 @@ class VigenereFrame(CipherFrame):
         label_keyword.grid(row=0, column=0, sticky=E, **pad_5_kwargs)
         entry_keyword.grid(row=0, column=1, sticky=W, **pad_5_kwargs)
 
-    def random_key_button(self):
-        super(VigenereFrame, self).random_key_button()
+    def set_key_variables(self):
         self.variable_keyword.set(self.cipher.key.keyword)
 
-    def clear_key_button(self):
-        super(VigenereFrame, self).clear_key_button()
-        self.variable_keyword.set(self.cipher.key.keyword)
+
+class VigenereFrame(KeywordFrame):
+    def __init__(self, master):
+        super(VigenereFrame, self).__init__(master, VigenereCipher)
+
+
+class PlayfairFrame(KeywordFrame):
+    def __init__(self, master):
+        super(PlayfairFrame, self).__init__(master, PlayfairCipher)
+
+        # Setup Key Variables
+        self.variable_key_row_0 = StringVar()
+        self.variable_key_row_1 = StringVar()
+        self.variable_key_row_2 = StringVar()
+        self.variable_key_row_3 = StringVar()
+        self.variable_key_row_4 = StringVar()
+
+        # Setup Key Variable Widgets
+        label_key_table = ttk.Label(self.frame_key_variables, text='Key Table')
+        label_key_row_0 = ttk.Label(self.frame_key_variables, text='A B C D E', font=('Courier', 11),
+                                    textvariable=self.variable_key_row_0)
+        label_key_row_1 = ttk.Label(self.frame_key_variables, text='F G H I K', font=('Courier', 11),
+                                    textvariable=self.variable_key_row_1)
+        label_key_row_2 = ttk.Label(self.frame_key_variables, text='L M N O P', font=('Courier', 11),
+                                    textvariable=self.variable_key_row_2)
+        label_key_row_3 = ttk.Label(self.frame_key_variables, text='Q R S T U', font=('Courier', 11),
+                                    textvariable=self.variable_key_row_3)
+        label_key_row_4 = ttk.Label(self.frame_key_variables, text='V W X Y Z', font=('Courier', 11),
+                                    textvariable=self.variable_key_row_4)
+
+        # Place Key Variable Widgets
+        label_key_table.grid(row=1, column=0, sticky=E, pady=(5, 0))
+        label_key_row_0.grid(row=1, column=1, sticky=W, padx=(15, 0))
+        label_key_row_1.grid(row=2, column=1, sticky=W, padx=(15, 0))
+        label_key_row_2.grid(row=3, column=1, sticky=W, padx=(15, 0))
+        label_key_row_3.grid(row=4, column=1, sticky=W, padx=(15, 0))
+        label_key_row_4.grid(row=5, column=1, sticky=W, padx=(15, 0), pady=(0, 5))
+
+    def set_key_variables(self):
+        super(PlayfairFrame, self).set_key_variables()
+        self.variable_key_row_0.set(' '.join(self.cipher.key.key_table[0]))
+        self.variable_key_row_1.set(' '.join(self.cipher.key.key_table[1]))
+        self.variable_key_row_2.set(' '.join(self.cipher.key.key_table[2]))
+        self.variable_key_row_3.set(' '.join(self.cipher.key.key_table[3]))
+        self.variable_key_row_4.set(' '.join(self.cipher.key.key_table[4]))

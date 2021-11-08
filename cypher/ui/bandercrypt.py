@@ -10,7 +10,7 @@ class App:
         self.mainframe = ttk.Frame(master)
 
         self.master.title('Bandercrypt')
-        self.master.geometry('450x700')
+        self.master.geometry('450x750')
         self.master.resizable(False, False)
         self.master.option_add('*tearOff', False)
         self.setup_menubar()
@@ -79,7 +79,8 @@ class App:
         polyalphabetic_menu.add_command(label='Porta', state=['disabled'])
         # add a block submenu
         block_menu = Menu(cipher_menu)
-        block_menu.add_command(label='Playfair', state=['disabled'])
+        block_menu.add_command(label='Playfair',
+                               command=lambda: self.setup_mainframe(mainframe.PlayfairFrame))
         block_menu.add_command(label='Four-Square', state=['disabled'])
         # add a transposition submenu
         transposition_menu = Menu(cipher_menu)
