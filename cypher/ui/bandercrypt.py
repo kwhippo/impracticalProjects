@@ -72,7 +72,8 @@ class App:
         substitution_menu.add_command(label='Base64', state=['disabled'])
         # add a polyalphabetic submenu
         polyalphabetic_menu = Menu(cipher_menu)
-        polyalphabetic_menu.add_command(label='Vigenere', state=['disabled'])
+        polyalphabetic_menu.add_command(label='Vigenere',
+                                        command=lambda: self.setup_mainframe(mainframe.VigenereFrame))
         polyalphabetic_menu.add_command(label='Autokey', state=['disabled'])
         polyalphabetic_menu.add_command(label='Beaufort', state=['disabled'])
         polyalphabetic_menu.add_command(label='Porta', state=['disabled'])

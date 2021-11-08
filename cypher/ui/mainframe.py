@@ -6,6 +6,7 @@ from cypher.cipher import Cipher
 from cypher.substitution import SubstitutionCipher
 from cypher.caesar import CaesarCipher
 from cypher.caesar_keyword import CaesarKeywordCipher
+from cypher.vigenere import VigenereCipher
 
 balanced_grid_kwargs = {'sticky': (N, S, E, W), 'pady': 5, 'padx': 5}
 pad_5_kwargs = {'pady': 5, 'padx': 5}
@@ -22,8 +23,8 @@ class Mainframe:
         self.label_title = ttk.Label(self.title_frame, text=f'{title}', style='Header.TLabel')
         self.label_title.pack()
 
-        self.title_frame.pack(pady=(10, 0))
-        self.content_frame.pack(pady=10)
+        self.title_frame.pack(pady=(10, 10))
+        self.content_frame.pack()
 
 
 class WelcomeFrame(Mainframe):
@@ -313,3 +314,27 @@ class CaesarKeywordFrame(CipherFrame):
         if self.variable_keyword.get() != '':
             self.cipher.key.calculate(keyword=self.variable_keyword.get())
             self.set_key_variables()
+
+
+class VigenereFrame(CipherFrame):
+    def __init__(self, master):
+        super().__init__(master, VigenereCipher)
+        # Configure Key Frame
+        # Setup Key Variables
+        self.variable_keyword = StringVar()
+
+        # Setup Key Variable Widgets
+        label_keyword = ttk.Label(self.frame_key_variables, text='Keyword')
+        entry_keyword = ttk.Entry(self.frame_key_variables, width=32, textvariable=self.variable_keyword)
+
+        # Place Key Variable Widgets
+        label_keyword.grid(row=0, column=0, sticky=E, **pad_5_kwargs)
+        entry_keyword.grid(row=0, column=1, sticky=W, **pad_5_kwargs)
+
+    def random_key_button(self):
+        super(VigenereFrame, self).random_key_button()
+        self.variable_keyword.set(self.cipher.key.keyword)
+
+    def clear_key_button(self):
+        super(VigenereFrame, self).clear_key_button()
+        self.variable_keyword.set(self.cipher.key.keyword)
