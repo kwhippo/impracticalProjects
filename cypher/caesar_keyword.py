@@ -32,7 +32,7 @@ def create_caesar_keyword_keys(keyword=None, alphabet=Cipher.ALPHABET):
 
 
 class CaesarKeywordKey(SubstitutionKey):
-    def __init__(self, keyword=None, *args, **kwargs):
+    def __init__(self, keyword='', *args, **kwargs):
         super(CaesarKeywordKey, self).__init__(*args, **kwargs)
         self.keyword = keyword
 
@@ -46,6 +46,10 @@ class CaesarKeywordKey(SubstitutionKey):
         keys = create_caesar_keyword_keys(keyword)
         self.set(**keys)
 
+    def random(self):
+        keys = create_caesar_keyword_keys()
+        self.set(**keys)
+
     def validate(self, alphabet=Cipher.ALPHABET):
         try:
             keys = create_caesar_keyword_keys(self.keyword)
@@ -57,4 +61,10 @@ class CaesarKeywordKey(SubstitutionKey):
 
 
 class CaesarKeywordCipher(SubstitutionCipher):
-    NAME = 'Caesar Keyword'
+    NAME = 'Caesar Keyword Cipher'
+
+    def set_key(self, key=CaesarKeywordKey()):
+        super(CaesarKeywordCipher, self).set_key(key)
+
+    def clear_key(self):
+        self.key = CaesarKeywordKey()
