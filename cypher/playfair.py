@@ -124,8 +124,10 @@ def validate_key_table(key_table):
 
 
 class PlayfairKey(Key):
-    def __init__(self, keyword=None, key_table=None):
+    def __init__(self, keyword='', key_table=None):
         super(PlayfairKey, self).__init__()
+        if key_table is None:
+            key_table = [[], [], [], [], []]
         self.keyword = keyword
         self.key_table = key_table
 
@@ -138,6 +140,9 @@ class PlayfairKey(Key):
     def calculate(self, *, keyword=None):
         self.keyword = keyword
         self.key_table = create_key_table(keyword)
+
+    def random(self):
+        self.calculate(keyword=get_random_word())
 
     def validate(self):
         if self.keyword is None and self.key_table is None:
@@ -164,4 +169,9 @@ class PlayfairCipher(Cipher):
     def decrypt(self):
         super(PlayfairCipher, self).decrypt()
         self.plaintext = crypt(self.ciphertext, self.key.key_table, -1)
-        # TODO: Find words, separate
+
+    def set_key(self, key=PlayfairKey()):
+        super(PlayfairCipher, self).set_key(key)
+
+    def clear_key(self):
+        self.key = PlayfairKey()
