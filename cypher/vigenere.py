@@ -37,8 +37,10 @@ def crypt(text, source_alphabet, crypted_alphabet):
 
 
 class VigenereKey(Key):
-    def __init__(self, keyword=None, key_list=None):
+    def __init__(self, keyword='', key_list=None):
         super(VigenereKey, self).__init__()
+        if key_list is None:
+            key_list = []
         self.keyword = keyword
         self.key_list = key_list
 
@@ -51,6 +53,9 @@ class VigenereKey(Key):
     def calculate(self, *, keyword=None):
         self.keyword = keyword
         self.key_list = create_key_list(keyword)
+
+    def random(self):
+        self.calculate(keyword=get_random_word())
 
     def validate(self, alphabet=Cipher.ALPHABET):
         if self.keyword is None and self.key_list is None:
@@ -72,7 +77,7 @@ class VigenereKey(Key):
 
 
 class VigenereCipher(Cipher):
-    NAME = 'Vigenere'
+    NAME = 'Vigenere Cipher'
 
     def __init__(self, *args, **kwargs):
         super(VigenereCipher, self).__init__(*args, **kwargs)
@@ -84,3 +89,9 @@ class VigenereCipher(Cipher):
     def decrypt(self):
         super(VigenereCipher, self).decrypt()
         self.plaintext = crypt(self.ciphertext, self.key.key_list, self.alphabet)
+
+    def set_key(self, key=VigenereKey()):
+        super(VigenereCipher, self).set_key(key)
+
+    def clear_key(self):
+        self.key = VigenereKey()
