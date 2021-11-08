@@ -77,6 +77,7 @@ class KeyGUI:
 
         self.variable_keyword.trace_add('write', self.write_variable_keyword)
 
+        # Setup Key Buttons
         self.frame_key_buttons = Frame(self.frame_key)
         self.button_clear = ttk.Button(self.frame_key_buttons, text='Clear',
                                        command=self.clear_key_button)

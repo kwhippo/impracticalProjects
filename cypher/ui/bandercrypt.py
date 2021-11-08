@@ -62,7 +62,8 @@ class App:
                                       command=lambda: self.setup_mainframe(mainframe.ReverseCaesarFrame))
         substitution_menu.add_command(label='Atbash',
                                       command=lambda: self.setup_mainframe(mainframe.AtbashFrame))
-        substitution_menu.add_command(label='Caesar Keyword', state=['disabled'])
+        substitution_menu.add_command(label='Caesar Keyword',
+                                      command=lambda: self.setup_mainframe(mainframe.CaesarKeywordFrame))
         substitution_menu.add_command(label='Morse', state=['disabled'])
         substitution_menu.add_command(label='Homophonic Substitution', state=['disabled'])
         substitution_menu.add_command(label='One-Pad', state=['disabled'])

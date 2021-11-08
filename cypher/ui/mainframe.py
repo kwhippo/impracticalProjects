@@ -5,6 +5,7 @@ from cypher.tools.utilities import get_random_fortune
 from cypher.cipher import Cipher
 from cypher.substitution import SubstitutionCipher
 from cypher.caesar import CaesarCipher
+from cypher.caesar_keyword import CaesarKeywordCipher
 
 balanced_grid_kwargs = {'sticky': (N, S, E, W), 'pady': 5, 'padx': 5}
 pad_5_kwargs = {'pady': 5, 'padx': 5}
@@ -271,3 +272,44 @@ class AtbashFrame(CaesarFrame):
 
         self.cipher.key.calculate(numeric_key=0)
         self.set_key_variables()
+
+
+class CaesarKeywordFrame(CipherFrame):
+    def __init__(self, master):
+        super(CaesarKeywordFrame, self).__init__(master, CaesarKeywordCipher)
+        # Configure Key Frame
+        # Setup Key Variables
+        self.variable_alpha_key = StringVar()
+        self.variable_keyword = StringVar()
+
+        self.variable_keyword.trace_add('write', self.write_variable_keyword)
+
+        # Setup Key Variable Widgets
+        label_alpha_key = ttk.Label(self.frame_key_variables, text='Alpha Key')
+        entry_alpha_key = ttk.Entry(self.frame_key_variables, width=32, textvariable=self.variable_alpha_key,
+                                    state=['readonly'])
+        label_keyword = ttk.Label(self.frame_key_variables, text='Keyword')
+        entry_keyword = ttk.Entry(self.frame_key_variables, width=32, textvariable=self.variable_keyword)
+
+        # Place Key Variable Widgets
+        label_alpha_key.grid(row=0, column=0, sticky=E, **pad_5_kwargs)
+        entry_alpha_key.grid(row=0, column=1, sticky=W, **pad_5_kwargs)
+        label_keyword.grid(row=1, column=0, sticky=E, **pad_5_kwargs)
+        entry_keyword.grid(row=1, column=1, sticky=W, **pad_5_kwargs)
+
+    def set_key_variables(self):
+        self.variable_alpha_key.set(self.cipher.key.alpha_key)
+        self.variable_keyword.set(self.cipher.key.keyword)
+
+    def random_key_button(self):
+        super(CaesarKeywordFrame, self).random_key_button()
+        self.set_key_variables()
+
+    def clear_key_button(self):
+        super(CaesarKeywordFrame, self).clear_key_button()
+        self.set_key_variables()
+
+    def write_variable_keyword(self, *args):
+        if self.variable_keyword.get() != '':
+            self.cipher.key.calculate(keyword=self.variable_keyword.get())
+            self.set_key_variables()
