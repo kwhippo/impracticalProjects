@@ -1,6 +1,7 @@
 import random
 from cypher.cipher import Key, Cipher
-from cypher.tools.utilities import is_prime, get_factors, get_random_word, break_string, SOURCE_FILES
+from cypher.tools.utilities import is_prime, get_factors, get_random_word, break_string, \
+    SOURCE_FILES
 
 
 def recommended_grid(text_length):
@@ -73,7 +74,8 @@ class RouteKey(Key):
     ]
     NOISE_OPTIONS = SOURCE_FILES
 
-    def __init__(self, key_list=None, key_string=None, columns=None, block='word', noise=None, fudgel='FUDGEL'):
+    def __init__(self, key_list=None, key_string=None, columns=None, block='word', noise=None,
+                 fudgel='FUDGEL'):
         super(RouteKey, self).__init__()
         self.key_list = key_list
         self.key_string = key_string
@@ -240,8 +242,8 @@ class RouteCipher(Cipher):
 
 if __name__ == '__main__':
     PLAINTEXT = "All the world's a stage, And & all the men and women merely players;"
-    CIPHERTEXT = 'PLANE WOMEN A ALL FUDGEL FISH WORLDS AND EDGE CROSS PLAYERS AND ALL THE FLOW THICK' \
-                 ' MERELY STAGE DURING MEN THE'
+    CIPHERTEXT = 'PLANE WOMEN A ALL FUDGEL FISH WORLDS AND EDGE CROSS PLAYERS AND ALL THE FLOW ' \
+                 'THICK MERELY STAGE DURING MEN THE'
     KEY_STRING = '-4 7 3 -6 1 -5 -2'
     k = RouteKey(key_string=KEY_STRING, block='word', noise=True)
     c = RouteCipher(plaintext=PLAINTEXT, key=k)

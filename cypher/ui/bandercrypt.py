@@ -42,6 +42,9 @@ class App:
     def setup_menu_cipher(self):
         # create the cipher menu
         cipher_menu = Menu(self.menubar)
+        # add an encoding submenu
+        encoding_menu = Menu(self.menubar)
+        encoding_menu.add_command(label='Base64', state=['disabled'])
         # add a codes submenu
         codes_menu = Menu(cipher_menu)
         codes_menu.add_command(label='Code Book', state=['disabled'])
@@ -53,27 +56,32 @@ class App:
         # add a substitution submenu
         substitution_menu = Menu(cipher_menu)
         substitution_menu.add_command(label='Simple Substitution',
-                                      command=lambda: self.setup_mainframe(mainframe.SimpleSubstitutionFrame))
+                                      command=lambda: self.setup_mainframe(
+                                          mainframe.SimpleSubstitutionFrame))
         substitution_menu.add_command(label='Caesar',
                                       command=lambda: self.setup_mainframe(mainframe.CaesarFrame))
         substitution_menu.add_command(label='ROT13',
                                       command=lambda: self.setup_mainframe(mainframe.ROT13Frame))
         substitution_menu.add_command(label='Caesar Reverse',
-                                      command=lambda: self.setup_mainframe(mainframe.ReverseCaesarFrame))
+                                      command=lambda: self.setup_mainframe(
+                                          mainframe.ReverseCaesarFrame))
         substitution_menu.add_command(label='Atbash',
                                       command=lambda: self.setup_mainframe(mainframe.AtbashFrame))
         substitution_menu.add_command(label='Caesar Keyword',
-                                      command=lambda: self.setup_mainframe(mainframe.CaesarKeywordFrame))
-        substitution_menu.add_command(label='Morse', state=['disabled'])
-        substitution_menu.add_command(label='Homophonic Substitution', state=['disabled'])
+                                      command=lambda: self.setup_mainframe(
+                                          mainframe.CaesarKeywordFrame))
+        substitution_menu.add_command(label='Homophonic Substitution',
+                                      command=lambda: self.setup_mainframe(
+                                          mainframe.HomophonicFrame))
         substitution_menu.add_command(label='One-Pad', state=['disabled'])
         substitution_menu.add_command(label='Polybius Square', state=['disabled'])
         substitution_menu.add_command(label='Straddle Checkerboard', state=['disabled'])
-        substitution_menu.add_command(label='Base64', state=['disabled'])
+        substitution_menu.add_command(label='Morse', state=['disabled'])
         # add a polyalphabetic submenu
         polyalphabetic_menu = Menu(cipher_menu)
         polyalphabetic_menu.add_command(label='Vigenere',
-                                        command=lambda: self.setup_mainframe(mainframe.VigenereFrame))
+                                        command=lambda: self.setup_mainframe(
+                                            mainframe.VigenereFrame))
         polyalphabetic_menu.add_command(label='Autokey', state=['disabled'])
         polyalphabetic_menu.add_command(label='Beaufort', state=['disabled'])
         polyalphabetic_menu.add_command(label='Porta', state=['disabled'])
@@ -114,6 +122,7 @@ class App:
         machines_menu.add_command(label='Enigma', state=['disabled'])
         machines_menu.add_command(label='Lorenz', state=['disabled'])
         # add the menu to the menubar
+        cipher_menu.add_cascade(label='Encoding', menu=encoding_menu)
         cipher_menu.add_cascade(label="Codes", menu=codes_menu)
         cipher_menu.add_cascade(label="Substitution", menu=substitution_menu)
         cipher_menu.add_cascade(label="Polyalphabetic", menu=polyalphabetic_menu)
@@ -153,8 +162,10 @@ class App:
         # create the help menu
         help_menu = Menu(self.menubar)
         # add menu options
-        help_menu.add_command(label='Welcome', command=lambda: self.setup_mainframe(mainframe.WelcomeFrame))
-        help_menu.add_command(label='About...', command=lambda: self.setup_mainframe(mainframe.Mainframe))
+        help_menu.add_command(label='Welcome',
+                              command=lambda: self.setup_mainframe(mainframe.WelcomeFrame))
+        help_menu.add_command(label='About...',
+                              command=lambda: self.setup_mainframe(mainframe.Mainframe))
         # add the menu to the menubar
         self.menubar.add_cascade(label="Help", menu=help_menu)
 

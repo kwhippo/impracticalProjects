@@ -1,5 +1,6 @@
 from cypher.cipher import Cipher, Key
-from cypher.tools.utilities import string_remove_duplicates, list_remove_duplicates, get_random_word, break_string
+from cypher.tools.utilities import string_remove_duplicates, list_remove_duplicates, \
+    get_random_word, break_string
 
 
 def find_letter(letter, key_table):
@@ -42,7 +43,7 @@ def crypt_bigram(bigram, key_table, slide):
         raise ValueError('Bigram must be 2 characters')
     for letter in bigram:
         bigram_list.append(letter)
-        if letter not in PlayfairCipher.ALPHABET:
+        if letter not in PlayfairKey.ALPHABET:
             raise ValueError('Bigram must only contain uppercase letters in the alphabet '
                              'excluding "J"')
     if bigram_list[0] == bigram_list[1]:
@@ -69,7 +70,7 @@ def crypt_bigram(bigram, key_table, slide):
 def crypt(text, key_table, slide):
     ciphertext = ''
     for symbol in text:
-        if symbol in PlayfairCipher.ALPHABET:
+        if symbol in PlayfairKey.ALPHABET:
             ciphertext += symbol
     cleaned_list = list(ciphertext)
     bigram_list = [cleaned_list.pop(0)]
@@ -93,7 +94,7 @@ def crypt(text, key_table, slide):
 
 def create_key_table(keyword):
     keyword = string_remove_duplicates(keyword.replace('J', 'I')).upper()
-    key_list = list(keyword) + list(PlayfairCipher.ALPHABET)
+    key_list = list(keyword) + list(PlayfairKey.ALPHABET)
     key_list = list_remove_duplicates(key_list)
     key_table = [[], [], [], [], []]
     for row in key_table:
@@ -119,13 +120,16 @@ def validate_key_table(key_table):
                 raise AttributeError('Cells in key table must contain only letters')
             alpha_list.append(letter)
     alpha_list.sort()
-    if alpha_list != list(PlayfairCipher.ALPHABET):
-        raise ValueError('Key table must include all letters in alphabet excluding "J" without duplicates')
+    if alpha_list != list(PlayfairKey.ALPHABET):
+        raise ValueError(
+            'Key table must include all letters in alphabet excluding "J" without duplicates')
 
 
 class PlayfairKey(Key):
+    ALPHABET = 'ABCDEFGHIKLMNOPQRSTUVWXYZ'
+
     def __init__(self, keyword='', key_table=None):
-        super(PlayfairKey, self).__init__()
+        super(PlayfairKey, self).__init__(alphabet=PlayfairKey.ALPHABET)
         if key_table is None:
             key_table = [[], [], [], [], []]
         self.keyword = keyword
@@ -154,12 +158,10 @@ class PlayfairKey(Key):
 
 
 class PlayfairCipher(Cipher):
-    ALPHABET = 'ABCDEFGHIKLMNOPQRSTUVWXYZ'
     NAME = 'Playfair Cipher'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.alphabet = PlayfairCipher.ALPHABET
 
     def encrypt(self):
         super(PlayfairCipher, self).encrypt()

@@ -4,7 +4,7 @@ from cypher.cipher import Key, Cipher
 
 # Utility Functions
 def random_alpha_key():
-    key_list = list(Cipher.ALPHABET)
+    key_list = list(Key.ALPHABET)
     random.shuffle(key_list)
     alpha_key = ''.join(key_list)
     return alpha_key
@@ -22,19 +22,21 @@ def crypt(text, source_alphabet, crypted_alphabet):
 
 # Cipher Definition
 class SubstitutionKey(Key):
-    def __init__(self, alpha_key=''):
+
+    def __init__(self, alpha_key='', alphabet=Key.ALPHABET):
         super().__init__()
         self.alpha_key = alpha_key
+        self.alphabet = alphabet
 
     def random(self):
         self.alpha_key = random_alpha_key()
 
-    def validate(self, alphabet=Cipher.ALPHABET):
+    def validate(self):
         try:
             validated = self.alpha_key.upper()
             key_set = set(validated)
-            assert len(key_set) == len(alphabet)
-            for character in alphabet:
+            assert len(key_set) == len(self.alphabet)
+            for character in self.alphabet:
                 assert character in key_set
             self.alpha_key = validated
         except Exception as e:
@@ -51,12 +53,12 @@ class SubstitutionCipher(Cipher):
     def encrypt(self):
         super(SubstitutionCipher, self).encrypt()
         plaintext = self.plaintext.upper()
-        self.ciphertext = crypt(plaintext, self.alphabet, self.key.alpha_key)
+        self.ciphertext = crypt(plaintext, self.key.alphabet, self.key.alpha_key)
 
     def decrypt(self):
         super(SubstitutionCipher, self).decrypt()
         ciphertext = self.ciphertext.upper()
-        self.plaintext = crypt(ciphertext, self.key.alpha_key, self.alphabet)
+        self.plaintext = crypt(ciphertext, self.key.alpha_key, self.key.alphabet)
 
     def set_key(self, key=SubstitutionKey()):
         super(SubstitutionCipher, self).set_key(key)

@@ -3,7 +3,7 @@ from tkinter import ttk
 from cypher.substitution import SubstitutionCipher, SubstitutionKey
 from cypher.caesar import CaesarCipher, CaesarKey
 from cypher.caesar_keyword import CaesarKeywordCipher, CaesarKeywordKey
-from cypher.playfaircipher import PlayfairCipher, PlayfairKey
+from cypher.playfair import PlayfairCipher, PlayfairKey
 from cypher.tools.utilities import get_random_fortune
 from cypher.vigenere import VigenereCipher, VigenereKey
 

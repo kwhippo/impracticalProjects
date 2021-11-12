@@ -1,9 +1,9 @@
 import random
 from cypher.substitution import SubstitutionKey, SubstitutionCipher
-from cypher.cipher import Cipher
+from cypher.cipher import Key
 
 
-def create_keys(input_key=None, alphabet=Cipher.ALPHABET, reverse=False):
+def create_keys(input_key=None, alphabet=Key.ALPHABET, reverse=False):
     plain_alphabet = alphabet
     if reverse:
         cipher_alphabet = alphabet[::-1]
@@ -37,7 +37,7 @@ def create_keys(input_key=None, alphabet=Cipher.ALPHABET, reverse=False):
     return {'alpha_key': alpha_key, 'ab_key': ab_key, 'numeric_key': numeric_key, 'a_key': a_key}
 
 
-def get_key_type(input_key, alphabet=Cipher.ALPHABET):
+def get_key_type(input_key, alphabet=Key.ALPHABET):
     try:
         input_key = str(input_key)
         try:
@@ -66,12 +66,14 @@ def get_key_type(input_key, alphabet=Cipher.ALPHABET):
 
 
 class CaesarKey(SubstitutionKey):
-    def __init__(self, numeric_key=0, ab_key='', a_key='', reverse=False, *args, **kwargs):
+    def __init__(self, numeric_key=0, ab_key='', a_key='', alphabet=SubstitutionKey.ALPHABET,
+                 reverse=False, *args, **kwargs):
         super(CaesarKey, self).__init__(*args, **kwargs)
         self.numeric_key = numeric_key
         self.ab_key = ab_key
         self.a_key = a_key
         self.reverse = reverse
+        self.alphabet = alphabet
 
     def set(self, *, alpha_key=None, numeric_key=None, ab_key=None, a_key=None):
         if alpha_key is not None:
@@ -122,7 +124,7 @@ class CaesarKey(SubstitutionKey):
         keys = create_keys(reverse=self.reverse)
         self.set(**keys)
 
-    def validate(self, alphabet=Cipher.ALPHABET):
+    def validate(self):
         for key_name, key_value in self.__dict__.items():
             if key_value and key_name != 'reverse':
                 validation_key = key_value
@@ -137,7 +139,7 @@ class CaesarKey(SubstitutionKey):
                     raise AssertionError('Keys in caesar key do not match')
                 except Exception as e:
                     raise e
-        super(CaesarKey, self).validate(alphabet=alphabet)
+        super(CaesarKey, self).validate()
 
 
 class CaesarCipher(SubstitutionCipher):

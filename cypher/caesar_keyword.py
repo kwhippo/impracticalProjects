@@ -1,9 +1,9 @@
-from cypher.cipher import Cipher
+from cypher.cipher import Key
 from cypher.tools.utilities import get_random_word
 from cypher.substitution import SubstitutionKey, SubstitutionCipher
 
 
-def create_caesar_keyword_keys(keyword=None, alphabet=Cipher.ALPHABET):
+def create_caesar_keyword_keys(keyword=None, alphabet=Key.ALPHABET):
     key_list = []
     if keyword is None:
         keyword = get_random_word(source='pokemon')
@@ -50,14 +50,14 @@ class CaesarKeywordKey(SubstitutionKey):
         keys = create_caesar_keyword_keys()
         self.set(**keys)
 
-    def validate(self, alphabet=Cipher.ALPHABET):
+    def validate(self):
         try:
             keys = create_caesar_keyword_keys(self.keyword)
             self.keyword = keys['keyword']
             self.alpha_key = keys['alpha_key']
         except Exception as e:
             raise e
-        super(CaesarKeywordKey, self).validate(alphabet=alphabet)
+        super(CaesarKeywordKey, self).validate()
 
 
 class CaesarKeywordCipher(SubstitutionCipher):
