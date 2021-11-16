@@ -126,7 +126,7 @@ class CaesarKey(SubstitutionKey):
 
     def validate(self):
         for key_name, key_value in self.__dict__.items():
-            if key_value and key_name != 'reverse':
+            if key_value and key_name != 'reverse' and key_name != 'alphabet':
                 validation_key = key_value
                 try:
                     validation_keys = create_keys(validation_key, reverse=self.reverse)
@@ -153,3 +153,9 @@ class CaesarCipher(SubstitutionCipher):
             self.key = CaesarKey(reverse=True)
         else:
             self.key = CaesarKey()
+
+
+if __name__ == '__main__':
+    c = CaesarCipher(key=CaesarKey())
+    c.key.random()
+    c.key.validate()
