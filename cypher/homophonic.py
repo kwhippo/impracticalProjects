@@ -15,6 +15,7 @@ from cypher.cipher import Key, Cipher
 from cypher.substitution import crypt
 from cypher.exceptions import KeyCalculationError, KeyValidationError, EncryptionError, \
     DecryptionError
+from cypher.tools.frequency import calculate_plaintext_frequency
 
 COMMON_FREQUENCY = [
     812,  # A
@@ -47,7 +48,13 @@ COMMON_FREQUENCY = [
 
 
 def calculate_alpha_keys(alpha_dict_key):
-    pass
+    alpha_plain_key = ''
+    alpha_cipher_key = ''
+    for key, value in alpha_dict_key.items():
+        for character in value:
+            alpha_plain_key += key
+            alpha_cipher_key += character
+    return alpha_plain_key, alpha_cipher_key
 
 
 def calculate_alpha_text_key(alpha_dict_key):
@@ -67,7 +74,6 @@ def calculate_alpha_text_key(alpha_dict_key):
     return alpha_text_key
 
 
-# WORKING
 def calculate_alpha_dict(alpha_plain_key, alpha_cipher_key):
     alpha_dict_key = {}
     index = 0
@@ -78,89 +84,6 @@ def calculate_alpha_dict(alpha_plain_key, alpha_cipher_key):
             alpha_dict_key[character] = [alpha_cipher_key[index]]
         index += 1
     return alpha_dict_key
-
-
-# WORKING
-def calculate_plaintext_frequency(plaintext, alphabet):
-    """
-    Calculate the frequency of alphabet characters in plaintext and return frequency list
-
-    :param plaintext: Text body to calculate frequency from
-    :type plaintext: str
-    :param alphabet: String value of plaintext alphabet
-    :return: frequency: List of frequency sorted in alphabet order
-    """
-    alpha_dict = {}
-    for character in alphabet:
-        alpha_dict[character] = 1
-    for character in plaintext:
-        if character in alpha_dict:
-            alpha_dict[character] += 1
-    frequency_list = [x for x in alpha_dict.values()]
-    return frequency_list
-
-
-def validate_string_key(string_key):
-    """
-    Validate the string key variable.
-
-    :param string_key: string value of cipher key
-    :type string_key: str
-    :raises
-        KeyValidationError: Key variable is invalid
-    """
-    try:
-        if isinstance(string_key, str):
-            raise TypeError
-        assert len(string_key) > 0
-    except TypeError:
-        raise KeyValidationError('String key must be a string') from TypeError
-    except AssertionError:
-        raise KeyValidationError('String key must not be blank') from AssertionError
-    except Exception as e:
-        raise Exception('String key is invalid') from e
-
-
-def validate_list_key(list_key):
-    """
-    Validate the list key variable.
-
-    :param list_key: list value of cipher key
-    :type list_key: list
-    :raises
-        KeyValidationError: Key variable is invalid
-    """
-    try:
-        if isinstance(list_key, list):
-            raise TypeError
-        assert len(list_key) > 0
-    except TypeError:
-        raise KeyValidationError('List key must be a list') from TypeError
-    except AssertionError:
-        raise KeyValidationError('List key must be greater than 0') from AssertionError
-    except Exception as e:
-        raise Exception('List key is invalid') from e
-
-
-def validate_numeric_key(numeric_key):
-    """
-    Validate the int key variable.
-
-    :param numeric_key: numeric value of cipher key
-    :type numeric_key: int
-    :raises
-        KeyValidationError: Key variable is invalid
-    """
-    try:
-        if isinstance(numeric_key, int):
-            raise TypeError
-        assert numeric_key > 0
-    except TypeError:
-        raise KeyValidationError('Numeric key must be an integer') from TypeError
-    except AssertionError:
-        raise KeyValidationError('Numeric key must be greater than 0') from AssertionError
-    except Exception as e:
-        raise Exception('Numeric key is invalid') from e
 
 
 def random_alpha_dict_key(alphabet, cipher_alphabet, frequency=None):
@@ -199,6 +122,13 @@ def random_alpha_keys(alphabet, cipher_alphabet, frequency=None):
     return alpha_plain_key, alpha_cipher_key
 
 
+def random_frequency(alphabet):
+    frequency = []
+    for i in range(len(alphabet)):
+        frequency.append(random.randint(1, 1000))
+    return frequency
+
+
 class HomophonicKey(Key):
     """The key class manages the key used for cipher encryption and decryption."""
 
@@ -212,7 +142,7 @@ class HomophonicKey(Key):
 
     def __init__(self, alpha_dict_key=None, alpha_plain_key='', alpha_cipher_key='',
                  alpha_text_key='', cipher_alphabet=CIPHER_ALPHABET, alphabet=Key.ALPHABET,
-                 optimize='common'):
+                 optimize='common', frequency=None):
         """
         Initialize key attributes from arguments or default to blank values.
 
@@ -232,14 +162,41 @@ class HomophonicKey(Key):
         """
         super().__init__(alphabet=alphabet)
         if alpha_dict_key is None:
-            alpha_dict = {}
+            self.alpha_dict_key = {}
             for character in Key.ALPHABET:
-                alpha_dict[character] = ''
+                self.alpha_dict_key[character] = ''
+        else:
+            self.alpha_dict_key = alpha_dict_key
         self.alpha_plain_key = alpha_plain_key
         self.alpha_cipher_key = alpha_cipher_key
         self.cipher_alphabet = cipher_alphabet
         self.alpha_text_key = alpha_text_key
         self.optimize = optimize
+        if frequency is None:
+            self.frequency = [1] * len(self.alphabet)
+        else:
+            self.frequency = frequency
+
+    def calculate(self):
+        # TODO: Validate alpha_dict_key, optimize, frequency
+        self.alpha_plain_key, self.alpha_cipher_key = calculate_alpha_keys(self.alpha_dict_key)
+        self.alpha_text_key = calculate_alpha_text_key(self.alpha_dict_key)
+
+    def calculate_frequency(self, plaintext=None):
+        try:
+            if self.optimize == 'common':
+                self.frequency = COMMON_FREQUENCY
+            elif self.optimize == 'plaintext':
+                assert plaintext is not None
+                self.frequency = calculate_plaintext_frequency(plaintext, self.alphabet)
+            elif self.optimize == 'random':
+                self.frequency = random_frequency(self.alphabet)
+            else:
+                raise KeyCalculationError('Invalid option for optimize attribute')
+        except AssertionError as e:
+            raise KeyCalculationError("Plaintext required for plaintext optimization") from e
+        except Exception as e:
+            raise KeyCalculationError from e
 
     # def calculate(self, *, string_key=None, list_key=None, numeric_key=None):
     #     """
@@ -289,33 +246,14 @@ class HomophonicKey(Key):
     #     except Exception as e:
     #         raise KeyValidationError('Invalid key') from e
     #
-    def random(self, frequency=None):
+    def random(self):
         """Create a random key and set key attributes."""
-        pk, ck = random_alpha_keys(Key.ALPHABET, HomophonicKey.CIPHER_ALPHABET,
-                                   frequency=frequency)
-        print(pk)
-        print(ck)
-        dk = random_alpha_dict_key(Key.ALPHABET, HomophonicKey.CIPHER_ALPHABET, frequency=frequency)
-        pprint(calculate_alpha_dict(pk, ck))
-
-    #
-    # def set(self, *, string_key=None, list_key=None, numeric_key=None):
-    #     """
-    #     Set key attributes from keyword arguments.
-    #
-    #     :param string_key: value of string key attribute
-    #     :type string_key: str
-    #     :param list_key: value of list key attribute
-    #     :type list_key: list
-    #     :param numeric_key: value of numeric key attribute
-    #     :type numeric_key: int
-    #     """
-    #     if string_key is not None:
-    #         self.string_key = string_key
-    #     if list_key is not None:
-    #         self.list_key = list_key
-    #     if numeric_key is not None:
-    #         self.numeric_key = numeric_key
+        self.alpha_plain_key, self.alpha_cipher_key = \
+            random_alpha_keys(Key.ALPHABET,
+                              HomophonicKey.CIPHER_ALPHABET,
+                              frequency=self.frequency)
+        self.alpha_dict_key = calculate_alpha_dict(self.alpha_plain_key, self.alpha_cipher_key)
+        self.alpha_text_key = calculate_alpha_text_key(self.alpha_dict_key)
 
 
 class HomophonicCipher(Cipher):
@@ -340,7 +278,18 @@ class HomophonicCipher(Cipher):
             EncryptionError: Unable to encrypt plaintext using key
         """
         try:
-            super().encrypt()
+            self.key.validate()
+            print(f'Alpha Plain Key: {self.key.alpha_plain_key}')
+            print(f'Alpha Cipher Key: {self.key.alpha_cipher_key}')
+            pprint(self.key.alpha_dict_key)
+            plaintext = self.plaintext.upper()
+            ciphertext = ''
+            for character in plaintext:
+                if character in self.key.alphabet:
+                    ciphertext += random.choice(self.key.alpha_dict_key[character])
+                else:
+                    ciphertext += character
+            self.ciphertext = ciphertext
         except Exception as e:
             self.ciphertext = ''
             raise EncryptionError from e
@@ -353,7 +302,12 @@ class HomophonicCipher(Cipher):
             DecryptionError: Unable to decrypt ciphertext using key
         """
         try:
-            super().decrypt()
+            self.key.validate()
+            print(f'Alpha Plain Key: {self.key.alpha_plain_key}')
+            print(f'Alpha Cipher Key: {self.key.alpha_cipher_key}')
+            pprint(self.key.alpha_dict_key)
+            self.plaintext = crypt(self.ciphertext, self.key.alpha_cipher_key,
+                                   self.key.alpha_plain_key)
         except Exception as e:
             self.plaintext = ''
             raise DecryptionError from e
@@ -377,8 +331,5 @@ class HomophonicCipher(Cipher):
 
 
 if __name__ == '__main__':
-    dk = random_alpha_dict_key(Key.ALPHABET, HomophonicKey.CIPHER_ALPHABET,
-                               frequency=COMMON_FREQUENCY)
-    pprint(dk)
-    print(calculate_alpha_text_key(dk))
-    HomophonicKey().print()
+    c = HomophonicCipher()
+    c.set_key()
