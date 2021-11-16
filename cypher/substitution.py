@@ -14,7 +14,7 @@ def crypt(text, source_alphabet, crypted_alphabet):
     crypted_text = ''
     for character in text:
         crypted_character = character
-        if character in crypted_alphabet:
+        if character in source_alphabet:
             crypted_character = crypted_alphabet[source_alphabet.find(character)]
         crypted_text += crypted_character
     return crypted_text
