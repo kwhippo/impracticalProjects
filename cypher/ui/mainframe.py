@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
-from cypher.tools.utilities import get_random_fortune
+from pprint import pprint
+from cypher.tools.utilities import get_random_fortune, break_string
+from cypher.tools.frequency import calculate_plaintext_frequency
 from cypher.cipher import Cipher
 from cypher.substitution import SubstitutionCipher
 from cypher.caesar import CaesarCipher
@@ -10,7 +12,7 @@ from cypher.vigenere import VigenereCipher
 from cypher.playfair import PlayfairCipher
 from cypher.homophonic import HomophonicCipher
 
-balanced_grid_kwargs = {'sticky': (N, S, E, W), 'pady': 5, 'padx': 5}
+balanced_grid_kwargs = {'sticky': (N, S, E, W), 'pady': 10, 'padx': 10}
 pad_5_kwargs = {'pady': 5, 'padx': 5}
 
 
@@ -25,8 +27,8 @@ class Mainframe:
         self.label_title = ttk.Label(self.title_frame, text=f'{title}', style='Header.TLabel')
         self.label_title.pack()
 
-        self.title_frame.pack(pady=(10, 10))
-        self.content_frame.pack()
+        self.title_frame.pack(pady=(10, 0))
+        self.content_frame.pack(padx=10, pady=10)
 
 
 class WelcomeFrame(Mainframe):
@@ -53,12 +55,12 @@ class CipherFrame(Mainframe):
         self.cipher = cipher()
         self.cipher.set_key()
         # Setup Frames
-        self.frame_key = LabelFrame(master, text='Key')
+        self.frame_key = ttk.LabelFrame(master, text='Key')
         self.frame_text = ttk.Frame(master)
 
         # Configure Key Frame
         # Setup Key Button Frame
-        self.frame_key_buttons = Frame(self.frame_key)
+        self.frame_key_buttons = ttk.Frame(self.frame_key)
         self.button_clear_key = ttk.Button(self.frame_key_buttons, text='Clear',
                                            command=self.clear_key_button)
         self.button_random_key = ttk.Button(self.frame_key_buttons, text='Random',
@@ -66,7 +68,7 @@ class CipherFrame(Mainframe):
         self.button_clear_key.grid(row=0, column=0, **balanced_grid_kwargs)
         self.button_random_key.grid(row=0, column=1, **balanced_grid_kwargs)
         # Setup Key Variables Frame
-        self.frame_key_variables = Frame(self.frame_key)
+        self.frame_key_variables = ttk.Frame(self.frame_key)
         # Place Key Frames
         self.frame_key_variables.pack()
         self.frame_key_buttons.pack()
@@ -109,14 +111,19 @@ class CipherFrame(Mainframe):
         self.text_plaintext.replace('1.0', 'end', t)
 
     def encrypt_button(self):
+        print('Starting encryption...')
         self.cipher.plaintext = self.text_plaintext.get('1.0', 'end')
+        print(f'Plaintext: {self.cipher.plaintext}')
         try:
+            print('Encrypting...')
             self.cipher.encrypt()
         except Exception as e:
             messagebox.showerror('Encryption Error', e)
+        print(f'Ciphertext: {self.cipher.ciphertext}')
         self.text_ciphertext.replace('1.0', 'end', self.cipher.ciphertext)
 
     def decrypt_button(self):
+        print('Decrypting...')
         self.cipher.ciphertext = self.text_ciphertext.get('1.0', 'end')
         try:
             self.cipher.decrypt()
@@ -389,6 +396,7 @@ class HomophonicFrame(CipherFrame):
     def __init__(self, master, cipher=HomophonicCipher):
         super().__init__(master, cipher)
         # Configure Key Frame
+        self.window_configure_key = None
         # Setup Key Variables
         self.variable_optimize = StringVar()
         self.variable_a_key = StringVar()
@@ -418,31 +426,18 @@ class HomophonicFrame(CipherFrame):
         self.variable_y_key = StringVar()
         self.variable_z_key = StringVar()
 
-        self.variable_optimize.set('common')
+        self.variable_optimize.set(self.cipher.key.optimize)
 
         # Setup Key Variable Widgets
         label_key = ttk.Label(self.frame_key_variables, text='Alpha Key')
-        text_key = Text(self.frame_key_variables, width=32, height=5, state='disabled')
-        label_optimize = ttk.Label(self.frame_key_variables, text='Optimize')
-        radio_common = ttk.Radiobutton(self.frame_key_variables, text='Common', value='common',
-                                       variable=self.variable_optimize)
-        radio_plaintext = ttk.Radiobutton(self.frame_key_variables, text='Plaintext',
-                                          value='plaintext', variable=self.variable_optimize)
-        radio_random = ttk.Radiobutton(self.frame_key_variables, text='Random', value='random',
-                                       variable=self.variable_optimize)
-
-        # Place Key Variable Widgets
+        self.text_key = Text(self.frame_key_variables, width=32, height=5, state='disabled')
+        self.setup_optimize_widgets(self.frame_key_variables)
         label_key.grid(row=0, column=0, sticky=(N, E), **pad_5_kwargs)
-        text_key.grid(row=0, column=1, sticky=W, columnspan=3, **pad_5_kwargs)
-        label_optimize.grid(row=1, column=0, sticky=E, **pad_5_kwargs)
-        radio_common.grid(row=1, column=1, **pad_5_kwargs)
-        radio_plaintext.grid(row=1, column=2, **pad_5_kwargs)
-        radio_random.grid(row=1, column=3, **pad_5_kwargs)
+        self.text_key.grid(row=0, column=1, sticky=W, columnspan=3, **pad_5_kwargs)
 
         # Override Key Button Frame from Cipher Frame
         self.button_configure_key = ttk.Button(self.frame_key_buttons, text='Configure',
                                                command=self.configure_key_button)
-
         self.button_clear_key.grid_forget()
         self.button_random_key.grid_forget()
 
@@ -450,22 +445,32 @@ class HomophonicFrame(CipherFrame):
         self.button_clear_key.grid(row=0, column=1, **balanced_grid_kwargs)
         self.button_random_key.grid(row=0, column=3, **balanced_grid_kwargs)
 
-        # Setup Configure Window
-        # IF NEEDED
+    def setup_optimize_widgets(self, master_frame):
+        label_optimize = ttk.Label(master_frame, text='Optimize')
+        radio_common = ttk.Radiobutton(master_frame, text='Common', value='common',
+                                       variable=self.variable_optimize,
+                                       command=self.radio_optimize_selected)
+        radio_plaintext = ttk.Radiobutton(master_frame, text='Plaintext',
+                                          value='plaintext', variable=self.variable_optimize,
+                                          command=self.radio_optimize_selected)
+        radio_random = ttk.Radiobutton(master_frame, text='Random', value='random',
+                                       variable=self.variable_optimize,
+                                       command=self.radio_optimize_selected)
 
-        # Testing
-        print(self.cipher.key.optimize)
-        print(self.variable_optimize.get())
-
-    def set_key_variables(self):
-        self.variable_optimize.set(self.cipher.key.optimize)
+        label_optimize.grid(row=1, column=0, sticky=E, **pad_5_kwargs)
+        radio_common.grid(row=1, column=1, **pad_5_kwargs)
+        radio_plaintext.grid(row=1, column=2, **pad_5_kwargs)
+        radio_random.grid(row=1, column=3, **pad_5_kwargs)
 
     def configure_key_button(self):
-        window_configure_key = Toplevel(self.master)
-        window_configure_key.title('Configure Key')
+        self.window_configure_key = Toplevel(self.master)
+        self.window_configure_key.title('Configure Key')
+        frame_configure_key = ttk.Frame(self.window_configure_key)
+        frame_configure_key.pack()
 
         # Setup Key Variable Frame
-        frame_key_variables = ttk.Frame(window_configure_key)
+        frame_key_variables = ttk.Frame(frame_configure_key)
+        # A-Z Keys
         label_a_key = ttk.Label(frame_key_variables, text='A')
         entry_a_key = ttk.Entry(frame_key_variables, width=10,
                                 textvariable=self.variable_a_key)
@@ -598,13 +603,18 @@ class HomophonicFrame(CipherFrame):
         label_z_key.grid(row=12, column=2, sticky=E, **pad_5_kwargs)
         entry_z_key.grid(row=12, column=3, sticky=W, **pad_5_kwargs)
 
+        # Setup Optimize Frame
+        frame_optimize_key = ttk.Frame(frame_configure_key)
+        self.setup_optimize_widgets(frame_optimize_key)
+
         # Setup Key Button Frame
-        frame_key_buttons = ttk.Frame(window_configure_key)
+        frame_key_buttons = ttk.Frame(frame_configure_key)
         button_clear_key = ttk.Button(frame_key_buttons, text='Clear',
                                       command=self.clear_key_button)
         button_random_key = ttk.Button(frame_key_buttons, text='Random',
                                        command=self.random_key_button)
-        button_save_key = ttk.Button(frame_key_buttons, text='Save')
+        button_save_key = ttk.Button(frame_key_buttons, text='Save',
+                                     command=self.save_key_button)
 
         button_clear_key.grid(row=0, column=0, **balanced_grid_kwargs)
         button_random_key.grid(row=0, column=1, **balanced_grid_kwargs)
@@ -612,4 +622,57 @@ class HomophonicFrame(CipherFrame):
 
         # Place Frames
         frame_key_variables.pack()
+        frame_optimize_key.pack()
         frame_key_buttons.pack()
+
+    def random_key_button(self):
+        self.cipher.key.calculate_frequency(self.text_plaintext.get('1.0', END))
+        super().random_key_button()
+        self.cipher.key.print()
+
+    def save_key_button(self):
+        self.write_variable_letter_key()
+        self.set_key_variables()
+        self.window_configure_key.destroy()
+
+    def set_key_variables(self):
+        pprint(self.cipher.key.alpha_dict_key)
+        for index, value in self.cipher.key.alpha_dict_key.items():
+            self.__getattribute__(f'variable_{index.lower()}_key').set(''.join(value))
+        self.cipher.key.calculate()
+        self.text_key.config(state='normal')
+        self.text_key.replace('1.0', 'end', self.cipher.key.alpha_text_key)
+        self.text_key.config(state='disabled')
+
+    def radio_optimize_selected(self):
+        self.cipher.key.optimize = self.variable_optimize.get()
+        self.cipher.key.calculate_frequency(self.text_plaintext.get('1.0', END))
+
+    def write_variable_letter_key(self):
+        self.cipher.key.alpha_dict_key['A'] = break_string(self.variable_a_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['B'] = break_string(self.variable_b_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['C'] = break_string(self.variable_c_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['D'] = break_string(self.variable_d_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['E'] = break_string(self.variable_e_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['F'] = break_string(self.variable_f_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['G'] = break_string(self.variable_g_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['H'] = break_string(self.variable_h_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['I'] = break_string(self.variable_i_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['J'] = break_string(self.variable_j_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['K'] = break_string(self.variable_k_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['L'] = break_string(self.variable_l_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['M'] = break_string(self.variable_m_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['N'] = break_string(self.variable_n_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['O'] = break_string(self.variable_o_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['P'] = break_string(self.variable_p_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['Q'] = break_string(self.variable_q_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['R'] = break_string(self.variable_r_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['S'] = break_string(self.variable_s_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['T'] = break_string(self.variable_t_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['U'] = break_string(self.variable_u_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['V'] = break_string(self.variable_v_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['W'] = break_string(self.variable_w_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['X'] = break_string(self.variable_x_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['Y'] = break_string(self.variable_y_key.get(), 1).split()
+        self.cipher.key.alpha_dict_key['Z'] = break_string(self.variable_z_key.get(), 1).split()
+        self.cipher.key.calculate()

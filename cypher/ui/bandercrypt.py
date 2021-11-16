@@ -10,7 +10,7 @@ class App:
         self.mainframe = ttk.Frame(master)
 
         self.master.title('Bandercrypt')
-        self.master.geometry('450x750')
+        # self.master.geometry('450x750')
         self.master.resizable(False, False)
         self.master.option_add('*tearOff', False)
         self.setup_menubar()
