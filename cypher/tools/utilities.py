@@ -1,5 +1,6 @@
 import os
 import random
+from pprint import pprint
 
 SOURCE_FILES = {
     'common': 'text_sources/words_common.txt',
@@ -26,9 +27,15 @@ def string_remove_duplicates(original_string):
 
 def break_string(original_string, step=5):
     string_list = []
-    for b in range(0, len(original_string), step):
-        string_list.append(original_string[b:b + step])
+    new_string = original_string.replace(' ', '')
+    for b in range(0, len(new_string), step):
+        string_list.append(new_string[b:b + step])
     return ' '.join(string_list)
+
+
+def break_string_to_list(original_string, step=1):
+    string_list = break_string(original_string, step)
+    return string_list.split(' ')
 
 
 def is_prime(number):
@@ -135,3 +142,24 @@ def validate_one_kwarg(**kwargs):
     if count != 1:
         valid = False
     return valid
+
+
+def validate_word(word):
+    assert isinstance(word, str), 'Word must be a string'
+    for character in word:
+        assert character.isalpha()
+
+
+def validate_string_list_ints(list_ints):
+    assert isinstance(list_ints, str), 'List of integers must be a string'
+    int_list = list_ints.split(' ')
+    for item in int_list:
+        try:
+            int(item)
+        except ValueError:
+            raise ValueError(f'Item {item} must be an integer')
+
+
+if __name__ == '__main__':
+    li = '1 -1 2 -2'
+    validate_string_list_ints(li)
