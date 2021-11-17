@@ -1,7 +1,8 @@
 import random
 from cypher.cipher import Key, Cipher
 from cypher.tools.utilities import is_prime, get_factors, get_random_word, break_string, \
-    SOURCE_FILES
+    SOURCE_FILES, validate_word, validate_string_list_ints, break_string_to_list
+from cypher.exceptions import KeyValidationError, KeyCalculationError
 
 
 def recommended_grid(text_length):
@@ -24,7 +25,7 @@ def recommended_grid(text_length):
     return grid
 
 
-def random_key_list(cols):
+def random_route(cols):
     plus_minus = (1, -1)
     key_list = []
     for key_int in range(1, cols + 1):
@@ -33,7 +34,7 @@ def random_key_list(cols):
     return key_list
 
 
-def validate_key_list(input_list):
+def validate_route(input_list):
     try:
         int_list = [abs(int(i)) for i in input_list]
         int_list.sort()
@@ -45,16 +46,16 @@ def validate_key_list(input_list):
         raise AssertionError('Key list must contain all abs values from 1 to length of list')
 
 
-def validate_key_string(input_string):
+def validate_route_string(input_string):
     try:
-        int_list = input_string.split(' ')
-        validate_key_list(int_list)
-    except AttributeError:
-        raise AttributeError('Key string must be a string')
-    except ValueError:
-        raise ValueError('Key list must be a list of ints separated by a single space')
+        validate_word(input_string)
+        return
+    except AssertionError:
+        pass
+    try:
+        validate_string_list_ints(input_string)
     except Exception as e:
-        raise e
+        raise KeyValidationError('Route string must be single word or string of integers') from e
 
 
 def validate_columns(input_columns):
@@ -67,70 +68,108 @@ def validate_columns(input_columns):
         raise AssertionError('Columns must be greater than 0')
 
 
-class RouteKey(Key):
+def calculate_route_from_keyword(keyword):
+    try:
+        validate_word(keyword)
+        kw_dict = {}
+        for index, character in enumerate(keyword.upper()):
+            kw_dict[index + 1] = character
+        sorted_list = sorted(kw_dict.items(), key=lambda kv: kv[1])
+        route = []
+        tup: tuple
+        for tup in sorted_list:
+            route.append(tup[0])
+        return route
+    except Exception as e:
+        raise KeyCalculationError from e
+
+
+def calculate_route_from_int_list(int_list):
+    try:
+        validate_string_list_ints(int_list)
+        route = [int(i) for i in int_list.split(' ')]
+        return route
+    except Exception as e:
+        raise KeyCalculationError from e
+
+
+class TranspositionKey(Key):
     BLOCKS = [
         'word',
         'character',
     ]
     NOISE_OPTIONS = SOURCE_FILES
 
-    def __init__(self, key_list=None, key_string=None, columns=None, block='word', noise=None,
-                 fudgel='FUDGEL'):
-        super(RouteKey, self).__init__()
-        self.key_list = key_list
-        self.key_string = key_string
-        self.columns = columns
+    def __init__(self, route=None, route_string='', columns=0, rows=0, optimize_columns=True,
+                 optimize_rows=True, block='word', noise=None, fudgel='FUDGEL'):
+        super(TranspositionKey, self).__init__()
+        if route is None:
+            self.route = []
+        else:
+            self.route = route
+        self.route_string = route_string
+        self.columns = columns  # if 0, optimize for text
+        self.rows = rows  # if 0, optimize for text
+        self.optimize_columns = optimize_columns
+        self.optimize_rows = optimize_rows
         self.block = block
-        self.noise = noise
-        self.fudgel = fudgel
+        self.noise = noise  # variable used to add additional obfuscating words/characters
+        self.fudgel = fudgel  # variable used to even out cipher grid
         if self.block == 'character' and self.fudgel == 'FUDGEL':
             self.fudgel = 'X'
 
-    def calculate(self, *, key_list=None, key_string=None, columns=None, best_fit_length=None):
+    def calculate(self, *, route=None, route_string=None, columns=None, best_fit_length=None):
         try:
-            if key_list is not None:
-                assert key_string is None
+            if route is not None:
+                assert route_string is None
                 assert columns is None
                 assert best_fit_length is None
                 try:
-                    validate_key_list(key_list)
+                    validate_route(route)
                 except Exception:
                     raise RuntimeError('Key list validation error')
-                self.key_list = key_list
-                self.key_string = ' '.join([str(i) for i in key_list])
-                self.columns = len(key_list)
-            elif key_string is not None:
-                assert key_list is None
+                self.route = route
+                self.route_string = ' '.join([str(i) for i in route])
+                self.columns = len(route)
+            elif route_string is not None:
+                assert route is None
                 assert columns is None
                 assert best_fit_length is None
                 try:
-                    validate_key_string(key_string)
-                except Exception:
-                    raise RuntimeError('Key string validation error')
-                self.key_list = [int(i) for i in key_string.split(' ')]
-                self.key_string = key_string
-                self.columns = len(self.key_list)
+                    validate_route_string(route_string)
+                except Exception as e:
+                    raise KeyCalculationError from e
+                try:
+                    self.route = calculate_route_from_keyword(route_string)
+                except KeyCalculationError:
+                    print('Not a keyword')
+                    try:
+                        self.route = calculate_route_from_int_list(route_string)
+                    except Exception as e:
+                        raise KeyCalculationError from e
+                self.route_string = route_string
+                self.columns = len(self.route)
             elif columns is not None:
-                assert key_list is None
-                assert key_string is None
+                assert route is None
+                assert route_string is None
                 assert best_fit_length is None
                 try:
                     validate_columns(columns)
                 except Exception:
                     raise RuntimeError('Column validation error')
-                self.key_list = random_key_list(columns)
-                self.key_string = ' '.join([str(i) for i in self.key_list])
+                self.route = random_route(columns)
+                self.route_string = ' '.join([str(i) for i in self.route])
                 self.columns = columns
             elif best_fit_length is not None:
-                assert key_list is None
-                assert key_string is None
+                assert route is None
+                assert route_string is None
                 assert columns is None
                 try:
                     cols = recommended_grid(best_fit_length)[0]
                 except Exception:
                     raise RuntimeError('Error calculating recommended grid')
-                self.key_list = random_key_list(cols)
-                self.key_string = ' '.join([str(i) for i in self.key_list])
+                self.route = random_route(cols)
+                self.route_string = ' '.join([str(i) for i in self.route])
                 self.columns = cols
             else:
                 raise AssertionError
@@ -140,14 +179,20 @@ class RouteKey(Key):
             raise e
 
     def validate(self):
-        super(RouteKey, self).validate()
+        super(TranspositionKey, self).validate()
+
+    def calculate_rows(self):
+        pass
+
+    def calculate_columns(self):
+        pass
 
 
-class RouteCipher(Cipher):
-    NAME = 'Route Cipher'
+class TranspositionCipher(Cipher):
+    NAME = 'Transposition Cipher'
 
     def __init__(self, *args, **kwargs):
-        super(RouteCipher, self).__init__(*args, **kwargs)
+        super(TranspositionCipher, self).__init__(*args, **kwargs)
 
     def encrypt(self):
         if self.key.block == 'word':
@@ -186,7 +231,7 @@ class RouteCipher(Cipher):
             col_items.append(filler_word)
             col_list.append(col_items)
         # Create the key and build shuffled list
-        key_list = random_key_list(cols)
+        key_list = random_route(cols)
         route_key = ' '.join(str(key) for key in key_list)
         cipher_list = []
         for key in key_list:
@@ -208,7 +253,7 @@ class RouteCipher(Cipher):
     def decrypt(self):
         # Convert inputs into usable values
         cipher_list = list(self.ciphertext.split())
-        key_int = [int(i) for i in self.key.key_list]
+        key_int = [int(i) for i in self.key.route]
         # Determine the number of rows and columns
         cols = len(key_int)
         rows = int(len(cipher_list) / len(key_int))
@@ -239,21 +284,12 @@ class RouteCipher(Cipher):
 
         return plaintext
 
+    def set_key(self, key=TranspositionKey()):
+        self.key = key
+
+    def clear_key(self):
+        self.key = TranspositionKey()
+
 
 if __name__ == '__main__':
-    PLAINTEXT = "All the world's a stage, And & all the men and women merely players;"
-    CIPHERTEXT = 'PLANE WOMEN A ALL FUDGEL FISH WORLDS AND EDGE CROSS PLAYERS AND ALL THE FLOW ' \
-                 'THICK MERELY STAGE DURING MEN THE'
-    KEY_STRING = '-4 7 3 -6 1 -5 -2'
-    k = RouteKey(key_string=KEY_STRING, block='word', noise=True)
-    c = RouteCipher(plaintext=PLAINTEXT, key=k)
-    c.encrypt()
-    if CIPHERTEXT == c.ciphertext:
-        print('Successful encryption!')
-    else:
-        print('Failed encryption :(')
-    c.decrypt()
-    if PLAINTEXT.upper() == c.plaintext:
-        print('Successful decryption!')
-    else:
-        print('Failed decryption :(')
+    print(calculate_route_from_keyword('GEORGE'))
