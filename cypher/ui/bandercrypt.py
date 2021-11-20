@@ -32,8 +32,14 @@ class App:
         # create the file menu
         file_menu = Menu(self.menubar)
         # add menu options
-        file_menu.add_command(label='New', state=['disabled'])
-        file_menu.add_command(label='Open...', state=['disabled'])
+        file_menu.add_command(label='Save Key', state=['disabled'])
+        file_menu.add_command(label='Load Key', state=['disabled'])
+        file_menu.add_separator()
+        file_menu.add_command(label='Save Plaintext', state=['disabled'])
+        file_menu.add_command(label='Open Plaintext', state=['disabled'])
+        file_menu.add_separator()
+        file_menu.add_command(label='Save Ciphertext', state=['disabled'])
+        file_menu.add_command(label='Open Ciphertext', state=['disabled'])
         file_menu.add_separator()
         file_menu.add_command(label='Exit', command=root.destroy)
         # add menu to the menubar
