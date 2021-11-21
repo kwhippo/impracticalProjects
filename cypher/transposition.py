@@ -41,9 +41,9 @@ def validate_route(input_list):
         test_list = [i for i in range(1, len(int_list) + 1)]
         assert int_list == test_list
     except ValueError:
-        raise ValueError('Key list must be a list of ints')
+        raise KeyValidationError('Key list must be a list of ints')
     except AssertionError:
-        raise AssertionError('Key list must contain all abs values from 1 to length of list')
+        raise KeyValidationError('Key list must contain all abs values from 1 to length of list')
 
 
 def validate_route_string(input_string):
@@ -63,9 +63,9 @@ def validate_columns(input_columns):
         cols = int(input_columns)
         assert cols > 0
     except ValueError:
-        raise ValueError('Columns must be an integer')
+        raise KeyValidationError('Columns must be an integer')
     except AssertionError:
-        raise AssertionError('Columns must be greater than 0')
+        raise KeyValidationError('Columns must be greater than 0')
 
 
 def calculate_route_from_keyword(keyword):
@@ -195,60 +195,17 @@ class TranspositionCipher(Cipher):
         super(TranspositionCipher, self).__init__(*args, **kwargs)
 
     def encrypt(self):
+        # Validate Key
+
+        # Break plaintext into list
         if self.key.block == 'word':
             plaintext_list = self.plaintext.split()
         else:
             plaintext_list = break_string(self.plaintext, step=self.key.block).split()
-        # Split plain text into list converting text to upper and stripping punctuation
-        for index, word in enumerate(plaintext_list):
-            if not word.isalnum():
-                clean_word = ''
-                for letter in word:
-                    if letter.isalnum():
-                        clean_word += letter
-                plaintext_list[index] = clean_word.upper()
-            else:
-                plaintext_list[index] = word.upper()
-        while '' in plaintext_list:
-            plaintext_list.remove('')
-        # Make sure length of list can be split evenly into columns adding filler word if required
-        if is_prime(len(plaintext_list)):
-            plaintext_list.append('FUDGEL')
-        # Check that the message is long enough to effectively encode
-        if len(plaintext_list) < 6:
-            raise Exception('That message is not long enough to encrypt')
-        # Select appropriately sized grid
-        grid = recommended_grid(len(plaintext_list))
-        cols = grid[0]
-        rows = grid[1]
-        # Build list of columns with noise added on last row
-        col_list = []
-        for c in range(cols):
-            col_items = []
-            for r in range(rows):
-                col_items.append(plaintext_list[c + (r * cols)])
-            filler_word = get_random_word().upper()
-            col_items.append(filler_word)
-            col_list.append(col_items)
-        # Create the key and build shuffled list
-        key_list = random_route(cols)
-        route_key = ' '.join(str(key) for key in key_list)
-        cipher_list = []
-        for key in key_list:
-            if key < 0:
-                cipher_row = col_list[(abs(key) - 1)]
-                cipher_list.append(cipher_row[::-1])
-            else:
-                cipher_row = col_list[key - 1]
-                cipher_list.append(cipher_row)
-        # Convert shuffled list to final cipher text
-        cipher_text_list = []
-        for chunk in cipher_list:
-            for word in chunk:
-                cipher_text_list.append(word)
-        cipher_text = ' '.join(cipher_text_list)
 
-        return cipher_text, route_key
+        # Create Grid from list and column/row info
+
+        # Using route, compile cipher text
 
     def decrypt(self):
         # Convert inputs into usable values
