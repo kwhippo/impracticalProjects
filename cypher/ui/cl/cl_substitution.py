@@ -3,7 +3,8 @@ import random
 import cypher.tools
 from cypher.caesar import input_caesar_key, create_caesar_key
 from cypher.caesar_keyword import input_keyword_key, create_keyword_key
-from cypher.substitution import encrypt, decrypt, ALPHABET, CIPHERS, random_alpha_key
+from cypher.substitution import encrypt, decrypt, ALPHABET, CIPHERS
+from cypher.tools.alphabet import random_alpha_key
 
 
 def cl_encrypt_text():

@@ -1,5 +1,5 @@
 from cypher.cipher import Key, Cipher
-from cypher.substitution import random_alpha_key
+from cypher.tools.alphabet import random_alpha_key
 from cypher.exceptions import KeyValidationError, EncryptionError, DecryptionError
 from cypher.tools.utilities import break_string_to_list, text_upper_strip_non_alphabet
 

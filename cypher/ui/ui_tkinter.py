@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
-from cypher.substitution import SubstitutionCipher, SubstitutionKey, random_alpha_key
+from cypher.substitution import SubstitutionCipher, SubstitutionKey
+from cypher.tools.alphabet import random_alpha_key
 from cypher.utilities import get_random_fortune
 
 # Setup Main Application Window
