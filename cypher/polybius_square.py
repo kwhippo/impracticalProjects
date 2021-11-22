@@ -1,7 +1,7 @@
 from cypher.cipher import Key, Cipher
 from cypher.substitution import random_alpha_key
 from cypher.exceptions import KeyValidationError, EncryptionError, DecryptionError
-from cypher.tools.utilities import break_string_to_list, plaintext_upper_strip_non_alphabet
+from cypher.tools.utilities import break_string_to_list, text_upper_strip_non_alphabet
 
 
 def random_xy_key():
@@ -74,7 +74,7 @@ class PolybiusSquareCipher(Cipher):
         try:
             self.key.validate()
             cipher_text = ''
-            for character in plaintext_upper_strip_non_alphabet(self.plaintext):
+            for character in text_upper_strip_non_alphabet(self.plaintext):
                 if character == 'J':
                     character = 'I'
                 cipher_index = self.key.cipher_alphabet.find(character)

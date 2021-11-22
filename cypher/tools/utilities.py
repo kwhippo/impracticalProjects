@@ -1,12 +1,21 @@
 import os
 import random
 from pprint import pprint
+from cypher.cipher import Key
 
 SOURCE_FILES = {
     'common': 'text_sources/words_common.txt',
     'extended': 'text_sources/words.txt',
     'pokemon': 'text_sources/pokemon.txt',
 }
+
+
+def text_upper_strip_non_alphabet(plaintext):
+    result = ''
+    for character in plaintext.upper():
+        if character in Key.ALPHABET:
+            result += character
+    return result
 
 
 def list_remove_duplicates(original_list):
