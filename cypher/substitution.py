@@ -3,8 +3,8 @@ from cypher.cipher import Key, Cipher
 
 
 # Utility Functions
-def random_alpha_key():
-    key_list = list(Key.ALPHABET)
+def random_alpha_key(alphabet=Key.ALPHABET):
+    key_list = list(alphabet)
     random.shuffle(key_list)
     alpha_key = ''.join(key_list)
     return alpha_key
