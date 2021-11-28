@@ -1,5 +1,5 @@
 from cypher.cipher import Key, Cipher
-from cypher.tools.alphabet import random_alpha_key
+from cypher.tools.alphabet import random_alphabet
 
 
 def crypt(text, source_alphabet, crypted_alphabet):
@@ -21,7 +21,7 @@ class SubstitutionKey(Key):
         self.alphabet = alphabet
 
     def random(self):
-        self.alpha_key = random_alpha_key()
+        self.alpha_key = random_alphabet()
 
     def validate(self):
         try:
