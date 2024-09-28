@@ -1,5 +1,8 @@
 from tkinter import *
-from tkinter import ttk, messagebox
+from tkinter.font import Font
+
+import ttkbootstrap as ttk
+from tkinter import messagebox
 from PIL import Image, ImageTk
 from pprint import pprint
 from cypher.tools.utilities import get_random_fortune, break_string
@@ -22,7 +25,7 @@ class Mainframe:
         self.title_frame = ttk.Frame(master)
         self.content_frame = ttk.Frame(master)
 
-        self.style = ttk.Style()
+        self.style = ttk.Style('cyborg')
         self.style.configure('Header.TLabel', font=('TkDefaultFont', 14, 'bold'))
         self.label_title = ttk.Label(self.title_frame, text=f'{title}', style='Header.TLabel')
         self.label_title.pack()
@@ -62,9 +65,9 @@ class CipherFrame(Mainframe):
         # Setup Key Button Frame
         self.frame_key_buttons = ttk.Frame(self.frame_key)
         self.button_clear_key = ttk.Button(self.frame_key_buttons, text='Clear',
-                                           command=self.clear_key_button)
+                                           command=self.clear_key_button, bootstyle='warning')
         self.button_random_key = ttk.Button(self.frame_key_buttons, text='Random',
-                                            command=self.random_key_button)
+                                            command=self.random_key_button, bootstyle='info')
         self.button_clear_key.grid(row=0, column=0, **balanced_grid_kwargs)
         self.button_random_key.grid(row=0, column=1, **balanced_grid_kwargs)
         # Setup Key Variables Frame
@@ -76,20 +79,20 @@ class CipherFrame(Mainframe):
         # Configure Text Frame
         self.label_plaintext = ttk.Label(self.frame_text, text='Plaintext')
         self.text_plaintext = Text(self.frame_text, width=50, height=10, wrap='word')
-        self.button_clear_plaintext = ttk.Button(self.frame_text, text='Clear',
+        self.button_clear_plaintext = ttk.Button(self.frame_text, text='Clear', bootstyle='warning',
                                                  command=lambda: self.text_plaintext.delete('1.0',
                                                                                             END))
-        self.button_random_plaintext = ttk.Button(self.frame_text, text='Random',
+        self.button_random_plaintext = ttk.Button(self.frame_text, text='Random', bootstyle='info',
                                                   command=self.random_plaintext_button)
-        self.button_encrypt = ttk.Button(self.frame_text, text='Encrypt',
+        self.button_encrypt = ttk.Button(self.frame_text, text='Encrypt', bootstyle='success',
                                          command=self.encrypt_button)
 
         self.label_ciphertext = ttk.Label(self.frame_text, text='Ciphertext')
         self.text_ciphertext = Text(self.frame_text, width=50, height=10, wrap='word')
-        self.button_clear_ciphertext = ttk.Button(self.frame_text, text='Clear',
+        self.button_clear_ciphertext = ttk.Button(self.frame_text, text='Clear', bootstyle='warning',
                                                   command=lambda: self.text_ciphertext.delete('1.0',
                                                                                               END))
-        self.button_decrypt = ttk.Button(self.frame_text, text='Decrypt',
+        self.button_decrypt = ttk.Button(self.frame_text, text='Decrypt', bootstyle='success',
                                          command=self.decrypt_button)
 
         self.label_plaintext.grid(column=0, row=0, **balanced_grid_kwargs)
@@ -430,7 +433,8 @@ class HomophonicFrame(CipherFrame):
 
         # Setup Key Variable Widgets
         label_key = ttk.Label(self.frame_key_variables, text='Alpha Key')
-        self.text_key = Text(self.frame_key_variables, width=32, height=5, state='disabled')
+        fixed_width_font = Font(family='Courier New', size=11)
+        self.text_key = Text(self.frame_key_variables, width=32, height=5, state='disabled', font=fixed_width_font)
         self.setup_optimize_widgets(self.frame_key_variables)
         label_key.grid(row=0, column=0, sticky=(N, E), **pad_5_kwargs)
         self.text_key.grid(row=0, column=1, sticky=W, columnspan=3, **pad_5_kwargs)

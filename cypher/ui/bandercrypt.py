@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import ttk
+import ttkbootstrap as ttk
 from cypher.ui import mainframe
 
 
