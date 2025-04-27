@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter.font import Font
 
 import ttkbootstrap as ttk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from PIL import Image, ImageTk
 from pprint import pprint
 from cypher.tools.utilities import get_random_fortune, break_string
@@ -78,6 +78,10 @@ class CipherFrame(Mainframe):
 
         # Configure Text Frame
         self.label_plaintext = ttk.Label(self.frame_text, text='Plaintext')
+        self.button_load_plaintext = ttk.Button(self.frame_text, text='Load', bootstyle='info-outline',
+                                                command=self.load_plaintext)
+        self.button_save_plaintext = ttk.Button(self.frame_text, text='Save', bootstyle='success-outline',
+                                                command=self.save_plaintext)
         self.text_plaintext = Text(self.frame_text, width=50, height=10, wrap='word')
         self.button_clear_plaintext = ttk.Button(self.frame_text, text='Clear', bootstyle='warning',
                                                  command=lambda: self.text_plaintext.delete('1.0',
@@ -88,6 +92,10 @@ class CipherFrame(Mainframe):
                                          command=self.encrypt_button)
 
         self.label_ciphertext = ttk.Label(self.frame_text, text='Ciphertext')
+        self.button_load_ciphertext = ttk.Button(self.frame_text, text='Load', bootstyle='info-outline',
+                                                 command=self.load_ciphertext)
+        self.button_save_ciphertext = ttk.Button(self.frame_text, text='Save', bootstyle='success-outline',
+                                                 command=self.save_ciphertext)
         self.text_ciphertext = Text(self.frame_text, width=50, height=10, wrap='word')
         self.button_clear_ciphertext = ttk.Button(self.frame_text, text='Clear', bootstyle='warning',
                                                   command=lambda: self.text_ciphertext.delete('1.0',
@@ -96,12 +104,16 @@ class CipherFrame(Mainframe):
                                          command=self.decrypt_button)
 
         self.label_plaintext.grid(column=0, row=0, **balanced_grid_kwargs)
+        self.button_load_plaintext.grid(column=1, row=0, **balanced_grid_kwargs)
+        self.button_save_plaintext.grid(column=2, row=0, **balanced_grid_kwargs)
         self.text_plaintext.grid(column=0, row=1, columnspan=3, **balanced_grid_kwargs)
         self.button_clear_plaintext.grid(column=0, row=2, **balanced_grid_kwargs)
         self.button_random_plaintext.grid(column=1, row=2, **balanced_grid_kwargs)
         self.button_encrypt.grid(column=2, row=2, **balanced_grid_kwargs)
 
         self.label_ciphertext.grid(column=0, row=3, **balanced_grid_kwargs)
+        self.button_load_ciphertext.grid(column=1, row=3, **balanced_grid_kwargs)
+        self.button_save_ciphertext.grid(column=2, row=3, **balanced_grid_kwargs)
         self.text_ciphertext.grid(column=0, row=4, columnspan=3, **balanced_grid_kwargs)
         self.button_clear_ciphertext.grid(column=0, row=5, **balanced_grid_kwargs)
         self.button_decrypt.grid(column=2, row=5, **balanced_grid_kwargs)
@@ -144,6 +156,42 @@ class CipherFrame(Mainframe):
 
     def set_key_variables(self):
         pass
+
+    def load_plaintext(self):
+        filepath = filedialog.askopenfilename(filetypes=[('Text Files', '*.txt')])
+        if filepath:
+            with open(filepath, 'r') as f:
+                plaintext = f.read()
+            self.text_plaintext.replace('1.0', 'end', plaintext)
+
+    def save_plaintext(self):
+        plaintext = self.text_plaintext.get('1.0', 'end').strip()
+        if not plaintext:
+            messagebox.showerror('Error', 'No plaintext to save.')
+            return
+        filepath = filedialog.asksaveasfilename(filetypes=[('Text Files', '*.txt')])
+        if filepath:
+            with open(filepath, 'w') as f:
+                f.write(plaintext)
+            messagebox.showinfo('Success', 'Saved plaintext.')
+
+    def load_ciphertext(self):
+        filepath = filedialog.askopenfilename(filetypes=[('Text Files', '*.txt')])
+        if filepath:
+            with open(filepath, 'r') as f:
+                ciphertext = f.read()
+            self.text_ciphertext.replace('1.0', 'end', ciphertext)
+
+    def save_ciphertext(self):
+        ciphertext = self.text_ciphertext.get('1.0', 'end').strip()
+        if not ciphertext:
+            messagebox.showerror('Error', 'No ciphertext to save.')
+            return
+        filepath = filedialog.asksaveasfilename(filetypes=[('Text Files', '*.txt')])
+        if filepath:
+            with open(filepath, 'w') as f:
+                f.write(ciphertext)
+            messagebox.showinfo('Success', 'Saved ciphertext.')
 
 
 class SimpleSubstitutionFrame(CipherFrame):

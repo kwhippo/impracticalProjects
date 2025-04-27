@@ -1,6 +1,7 @@
 from tkinter import *
 import ttkbootstrap as ttk
 from cypher.ui import mainframe
+from cypher.image_steganography import ImageSteganographyFrame
 
 
 class App:
@@ -31,28 +32,22 @@ class App:
 
     def setup_menubar(self):
         self.master.config(menu=self.menubar)
-        self.setup_menu_file()
+        self.setup_menu_keys()
         self.setup_menu_cipher()
         self.setup_menu_decryption()
         self.setup_menu_utilities()
         self.setup_menu_help()
 
-    def setup_menu_file(self):
-        # create the file menu
-        file_menu = Menu(self.menubar)
+    def setup_menu_keys(self):
+        # create the key menu
+        key_menu = Menu(self.menubar)
         # add menu options
-        file_menu.add_command(label='Save Key', state='disabled')
-        file_menu.add_command(label='Load Key', state='disabled')
-        file_menu.add_separator()
-        file_menu.add_command(label='Save Plaintext', state='disabled')
-        file_menu.add_command(label='Open Plaintext', state='disabled')
-        file_menu.add_separator()
-        file_menu.add_command(label='Save Ciphertext', state='disabled')
-        file_menu.add_command(label='Open Ciphertext', state='disabled')
-        file_menu.add_separator()
-        file_menu.add_command(label='Exit', command=root.destroy)
+        key_menu.add_command(label='Load Key', state='disabled')
+        key_menu.add_command(label='Save Key', state='disabled')
+        key_menu.add_separator()
+        key_menu.add_command(label='Manage Keys', state='disabled')
         # add menu to the menubar
-        self.menubar.add_cascade(label="File", menu=file_menu)
+        self.menubar.add_cascade(label="Keys", menu=key_menu)
 
     def setup_menu_cipher(self):
         # create the cipher menu
@@ -129,7 +124,7 @@ class App:
         steganography_menu = Menu(cipher_menu)
         steganography_menu.add_command(label='Ave Maria', state='disabled')
         steganography_menu.add_command(label='Baconian', state='disabled')
-        steganography_menu.add_command(label='Image', state='disabled')
+        steganography_menu.add_command(label='Image', command=lambda: self.setup_mainframe(ImageSteganographyFrame))
         # add a machines submenu
         machines_menu = Menu(cipher_menu)
         machines_menu.add_command(label='Decoder Ring', state='disabled')
@@ -158,7 +153,7 @@ class App:
         decryption_menu.add_command(label='Hill Climbing', state='disabled')
         decryption_menu.add_command(label='Brute Force', state='disabled')
         # add the menu to the menubar
-        self.menubar.add_cascade(label="Decryption", menu=decryption_menu)
+        self.menubar.add_cascade(label="Attack", menu=decryption_menu)
 
     def setup_menu_utilities(self):
         # create the utilities menu
@@ -179,8 +174,9 @@ class App:
         # add menu options
         help_menu.add_command(label='Welcome',
                               command=lambda: self.setup_mainframe(mainframe.WelcomeFrame))
-        help_menu.add_command(label='About...',
+        help_menu.add_command(label='About',
                               command=lambda: self.setup_mainframe(mainframe.Mainframe))
+        help_menu.add_command(label='Exit', command=root.destroy)
         # add the menu to the menubar
         self.menubar.add_cascade(label="Help", menu=help_menu)
 
